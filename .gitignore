@@ -1,0 +1,12 @@
+TODO.txt
+DEMO.txt
+*.iml
+target
+.idea/
+id_rsa
+id_rsa.pub
+jmeter.log
+results.log
+notes.txt
+Stateless.txt
+dependency.tree
