@@ -1,1 +1,1 @@
-# eduid-app-java-server-lib
+# tiqr-java-connector
