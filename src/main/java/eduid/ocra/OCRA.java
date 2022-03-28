@@ -75,13 +75,24 @@ public class OCRA {
     }
 
     /**
+     * This method generates an OCRA HOTP value for the QN08 variant
+     *
+     * @param sharedSecret       the shared secret between the two parties, HEX encoded
+     * @param challenge          the 8-numeric challenge question, HEX encoded
+     * @return A numeric String in base 10 that includes truncationDigits digits
+     */
+    static public String generateOCRA(String sharedSecret,
+                                      String challenge) {
+        return generateOCRA("OCRA-1:HOTP-SHA1-6:QN08", sharedSecret, null, challenge, null, null, null);
+    }
+    /**
      * This method generates an OCRA HOTP value for the given
      * set of parameters.
      *
      * @param ocraSuite          the OCRA Suite
      * @param key                the shared secret, HEX encoded
      * @param counter            the counter that changes
-     *                           on a per use basis,
+     *                           on a per-use basis,
      *                           HEX encoded
      * @param question           the challenge question, HEX encoded
      * @param password           a password that can be used,
@@ -100,7 +111,6 @@ public class OCRA {
                                       String timeStamp) {
         int codeDigits;
         String crypto = "";
-        StringBuilder result;
         int ocraSuiteLength = (ocraSuite.getBytes()).length;
         int counterLength = 0;
         int questionLength = 0;
@@ -127,14 +137,16 @@ public class OCRA {
 
         // The size of the byte array message to be encrypted
         // Counter
-        if (dataInput.toLowerCase().startsWith("c")) {
+        String dataInputLower = dataInput.toLowerCase();
+
+        if (dataInputLower.startsWith("c")) {
             // Fix the length of the HEX string
             counter = addLeadingZeros(counter, 16);
             counterLength = 8;
         }
         // Question - always 128 bytes
-        if (dataInput.toLowerCase().startsWith("q") ||
-                (dataInput.toLowerCase().contains("-q"))) {
+        if (dataInputLower.startsWith("q") ||
+                (dataInputLower.contains("-q"))) {
             StringBuilder questionBuilder = new StringBuilder(question);
             while (questionBuilder.length() < 256) {
                 questionBuilder.append("0");
@@ -144,55 +156,55 @@ public class OCRA {
         }
 
         // Password - sha1
-        if (dataInput.toLowerCase().indexOf("psha1") > 1) {
+        if (dataInputLower.indexOf("psha1") > 1) {
             password = addLeadingZeros(password, 40);
 
             passwordLength = 20;
         }
 
         // Password - sha256
-        if (dataInput.toLowerCase().indexOf("psha256") > 1) {
+        if (dataInputLower.indexOf("psha256") > 1) {
             password = addLeadingZeros(password, 64);
 
             passwordLength = 32;
         }
 
         // Password - sha512
-        if (dataInput.toLowerCase().indexOf("psha512") > 1) {
+        if (dataInputLower.indexOf("psha512") > 1) {
             password = addLeadingZeros(password, 128);
 
             passwordLength = 64;
         }
 
         // sessionInformation - s064
-        if (dataInput.toLowerCase().indexOf("s064") > 1) {
+        if (dataInputLower.indexOf("s064") > 1) {
             sessionInformation = addLeadingZeros(sessionInformation, 128);
             sessionInformationLength = 64;
         }
 
         // sessionInformation - s128
-        if (dataInput.toLowerCase().indexOf("s128") > 1) {
+        if (dataInputLower.indexOf("s128") > 1) {
             sessionInformation = addLeadingZeros(sessionInformation, 256);
 
             sessionInformationLength = 128;
         }
 
         // sessionInformation - s256
-        if (dataInput.toLowerCase().indexOf("s256") > 1) {
+        if (dataInputLower.indexOf("s256") > 1) {
             sessionInformation = addLeadingZeros(sessionInformation, 512);
 
             sessionInformationLength = 256;
         }
 
         // sessionInformation - s512
-        if (dataInput.toLowerCase().indexOf("s512") > 1) {
+        if (dataInputLower.indexOf("s512") > 1) {
             sessionInformation = addLeadingZeros(sessionInformation, 1024);
             sessionInformationLength = 512;
         }
 
         // TimeStamp
-        if (dataInput.toLowerCase().startsWith("t") ||
-                (dataInput.toLowerCase().indexOf("-t") > 1)) {
+        if (dataInputLower.startsWith("t") ||
+                (dataInputLower.indexOf("-t") > 1)) {
             timeStamp = addLeadingZeros(timeStamp, 16);
 
             timeStampLength = 8;
