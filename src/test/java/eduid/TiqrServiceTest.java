@@ -17,9 +17,9 @@ import static org.mockito.Mockito.when;
 
 class TiqrServiceTest {
 
-    private EnrollmentRepository enrollmentRepository = mock(EnrollmentRepository.class);
+    private final EnrollmentRepository enrollmentRepository = mock(EnrollmentRepository.class);
 
-    private RegistrationRepository registrationRepository = mock(RegistrationRepository.class);
+    private final RegistrationRepository registrationRepository = mock(RegistrationRepository.class);
 
     private final TiqrService tiqrService = new TiqrService(enrollmentRepository, registrationRepository, new Service(
             "test",
