@@ -26,9 +26,7 @@ class OCRATest {
                 hexString("timestamp"));
         assertEquals("380884", result);
 
-        String other = OCRA.generateOCRA(
-                hexString("secret"),
-                hexString("question"));
+        String other = OCRA.generateOCRA("secret", "question");
         assertEquals(result, other);
     }
 

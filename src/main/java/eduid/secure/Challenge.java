@@ -24,8 +24,8 @@ public class Challenge {
     private Challenge() {
     }
 
-    public static String generateQH10Challenge() {
-        return secureRandom.ints(10, 0, 10)
+    public static String generateQN08Challenge() {
+        return secureRandom.ints(8, 0, 10)
                 .boxed()
                 .map(Object::toString)
                 .collect(Collectors.joining());

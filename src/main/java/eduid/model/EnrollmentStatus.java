@@ -8,13 +8,13 @@ public enum EnrollmentStatus {
     FINALIZED(4),   // The application has stored the secret
     VALIDATED(5);   // A first successful authentication was performed
 
-    private final int status;
+    private final int value;
 
     EnrollmentStatus(int i) {
-        this.status = i;
+        this.value = i;
     }
 
-    public int getStatus() {
-        return status;
+    public int getValue() {
+        return value;
     }
 }

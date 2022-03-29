@@ -32,7 +32,4 @@ public class Enrollment implements Serializable {
         this.enrollmentSecret = enrollmentSecret;
     }
 
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
 }

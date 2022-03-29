@@ -1,9 +1,12 @@
 package eduid.secure;
 
+import org.apache.commons.codec.binary.Hex;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -77,13 +80,19 @@ public class OCRA {
     /**
      * This method generates an OCRA HOTP value for the QN08 variant
      *
-     * @param sharedSecret       the shared secret between the two parties, HEX encoded
-     * @param challenge          the 8-numeric challenge question, HEX encoded
+     * @param sharedSecret       the shared secret between the two parties
+     * @param challenge          the 8-numeric challenge question
      * @return A numeric String in base 10 that includes truncationDigits digits
      */
     static public String generateOCRA(String sharedSecret,
                                       String challenge) {
-        return generateOCRA("OCRA-1:HOTP-SHA1-6:QN08", sharedSecret, null, challenge, null, null, null);
+        return generateOCRA("OCRA-1:HOTP-SHA1-6:QN08",
+                Hex.encodeHexString(sharedSecret.getBytes(StandardCharsets.UTF_8)),
+                null,
+                Hex.encodeHexString(challenge.getBytes(StandardCharsets.UTF_8)),
+                null,
+                null,
+                null);
     }
     /**
      * This method generates an OCRA HOTP value for the given

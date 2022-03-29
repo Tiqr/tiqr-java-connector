@@ -37,7 +37,7 @@ public class TiqrService {
         return new MetaData(Service.addEnrollmentSecret(this.service, enrollmentSecret), new Identity(enrollment));
     }
 
-    void enrollData(Registration registration) {
+    Registration enrollData(Registration registration) {
         Enrollment enrollment = tiqrRepository.findEnrollmentByEnrollmentSecret(registration.getEnrollmentSecret())
                 .orElseThrow(IllegalArgumentException::new);
 
@@ -49,7 +49,7 @@ public class TiqrService {
         tiqrRepository.save(enrollment);
 
         registration.setSecret(secretCipher.encrypt(registration.getSecret()));
-        tiqrRepository.save(registration);
+        return tiqrRepository.save(registration);
     }
 
     EnrollmentStatus enrollmentStatus(String enrollmentKey) {
