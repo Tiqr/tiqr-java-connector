@@ -1,29 +1,36 @@
 package eduid;
 
 import eduid.model.*;
-import eduid.repo.TiqrRepository;
+import eduid.repo.EnrollmentRepository;
+import eduid.repo.RegistrationRepository;
 import eduid.secure.Challenge;
 import eduid.secure.SecretCipher;
 
 public class TiqrService {
 
-    private final TiqrRepository tiqrRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final RegistrationRepository registrationRepository;
+
     private final Service service;
     private final SecretCipher secretCipher;
 
-    public TiqrService(TiqrRepository tiqrRepository, Service service, String secret) {
-        this.tiqrRepository = tiqrRepository;
+    public TiqrService(EnrollmentRepository enrollmentRepository,
+                       RegistrationRepository registrationRepository,
+                       Service service,
+                       String secret) {
+        this.enrollmentRepository = enrollmentRepository;
+        this.registrationRepository = registrationRepository;
         this.service = service;
         this.secretCipher = new SecretCipher(secret);
     }
 
     Enrollment startEnrollment(String userID, String userDisplayName) {
         Enrollment enrollment = new Enrollment(Challenge.generateNonce(), userID, userDisplayName, EnrollmentStatus.INITIALIZED);
-        return tiqrRepository.save(enrollment);
+        return enrollmentRepository.save(enrollment);
     }
 
     MetaData getMetaData(String enrollmentKey) {
-        Enrollment enrollment = tiqrRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
+        Enrollment enrollment = enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
 
         if (!enrollment.getStatus().equals(EnrollmentStatus.INITIALIZED)) {
             throw new IllegalArgumentException("Metadata can only be retrieved when the status is INITIALIZED. Current status is " + enrollment.getStatus());
@@ -33,12 +40,12 @@ public class TiqrService {
         enrollment.setEnrollmentSecret(enrollmentSecret);
         enrollment.update(EnrollmentStatus.RETRIEVED);
 
-        tiqrRepository.save(enrollment);
+        enrollmentRepository.save(enrollment);
         return new MetaData(Service.addEnrollmentSecret(this.service, enrollmentSecret), new Identity(enrollment));
     }
 
     Registration enrollData(Registration registration) {
-        Enrollment enrollment = tiqrRepository.findEnrollmentByEnrollmentSecret(registration.getEnrollmentSecret())
+        Enrollment enrollment = enrollmentRepository.findEnrollmentByEnrollmentSecret(registration.getEnrollmentSecret())
                 .orElseThrow(IllegalArgumentException::new);
 
         if (!enrollment.getStatus().equals(EnrollmentStatus.RETRIEVED)) {
@@ -46,14 +53,14 @@ public class TiqrService {
         }
 
         enrollment.update(EnrollmentStatus.PROCESSED);
-        tiqrRepository.save(enrollment);
+        enrollmentRepository.save(enrollment);
 
         registration.setSecret(secretCipher.encrypt(registration.getSecret()));
-        return tiqrRepository.save(registration);
+        return registrationRepository.save(registration);
     }
 
     EnrollmentStatus enrollmentStatus(String enrollmentKey) {
-        return tiqrRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new).getStatus();
+        return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new).getStatus();
     }
 
 }
