@@ -24,12 +24,12 @@ public class TiqrService {
         this.secretCipher = new SecretCipher(secret);
     }
 
-    Enrollment startEnrollment(String userID, String userDisplayName) {
+    public Enrollment startEnrollment(String userID, String userDisplayName) {
         Enrollment enrollment = new Enrollment(Challenge.generateNonce(), userID, userDisplayName, EnrollmentStatus.INITIALIZED);
         return enrollmentRepository.save(enrollment);
     }
 
-    MetaData getMetaData(String enrollmentKey) {
+    public MetaData getMetaData(String enrollmentKey) {
         Enrollment enrollment = enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
 
         if (!enrollment.getStatus().equals(EnrollmentStatus.INITIALIZED)) {
@@ -44,7 +44,7 @@ public class TiqrService {
         return new MetaData(Service.addEnrollmentSecret(this.service, enrollmentSecret), new Identity(enrollment));
     }
 
-    Registration enrollData(Registration registration) {
+    public Registration enrollData(Registration registration) {
         Enrollment enrollment = enrollmentRepository.findEnrollmentByEnrollmentSecret(registration.getEnrollmentSecret())
                 .orElseThrow(IllegalArgumentException::new);
 
@@ -59,7 +59,7 @@ public class TiqrService {
         return registrationRepository.save(registration);
     }
 
-    EnrollmentStatus enrollmentStatus(String enrollmentKey) {
+    public EnrollmentStatus enrollmentStatus(String enrollmentKey) {
         return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new).getStatus();
     }
 
