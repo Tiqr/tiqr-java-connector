@@ -9,7 +9,7 @@
     </properties>
 
     <groupId>org.openconext</groupId>
-    <artifactId>eduid</artifactId>
+    <artifactId>tiqr-java-connector</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>eduid</name>
 
