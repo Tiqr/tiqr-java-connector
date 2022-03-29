@@ -1,6 +1,7 @@
 package eduid;
 
 import eduid.model.*;
+import eduid.repo.AuthenticationRepository;
 import eduid.repo.EnrollmentRepository;
 import eduid.repo.RegistrationRepository;
 import eduid.secure.Challenge;
@@ -10,16 +11,19 @@ public class TiqrService {
 
     private final EnrollmentRepository enrollmentRepository;
     private final RegistrationRepository registrationRepository;
+    private final AuthenticationRepository authenticationRepository;
 
     private final Service service;
     private final SecretCipher secretCipher;
 
     public TiqrService(EnrollmentRepository enrollmentRepository,
                        RegistrationRepository registrationRepository,
+                       AuthenticationRepository authenticationRepository,
                        Service service,
                        String secret) {
         this.enrollmentRepository = enrollmentRepository;
         this.registrationRepository = registrationRepository;
+        this.authenticationRepository = authenticationRepository;
         this.service = service;
         this.secretCipher = new SecretCipher(secret);
     }
@@ -61,6 +65,25 @@ public class TiqrService {
 
     public EnrollmentStatus enrollmentStatus(String enrollmentKey) {
         return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new).getStatus();
+    }
+
+    public Authentication startAuthentication(String userId, String userDisplayName) {
+        Authentication authentication = new Authentication(
+                userId,
+                userDisplayName,
+                Challenge.generateNonce(),
+                Challenge.generateQN08Challenge(),
+                AuthenticationStatus.PENDING);
+        return authenticationRepository.save(authentication);
+    }
+
+    public AuthenticationStatus authenticationStatus(String sessionKey) {
+        return authenticationRepository.findAuthenticationBySessionKey(sessionKey).orElseThrow(IllegalArgumentException::new).getStatus();
+    }
+
+    public Authentication authenticate() {
+        //todo find registration by user id and update notificationAddress
+        return null;
     }
 
 }

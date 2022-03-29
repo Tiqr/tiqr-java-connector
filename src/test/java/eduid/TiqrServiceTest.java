@@ -1,6 +1,7 @@
 package eduid;
 
 import eduid.model.*;
+import eduid.repo.AuthenticationRepository;
 import eduid.repo.EnrollmentRepository;
 import eduid.repo.RegistrationRepository;
 import eduid.secure.SecretCipher;
@@ -18,17 +19,21 @@ import static org.mockito.Mockito.when;
 class TiqrServiceTest {
 
     private final EnrollmentRepository enrollmentRepository = mock(EnrollmentRepository.class);
-
     private final RegistrationRepository registrationRepository = mock(RegistrationRepository.class);
+    private final AuthenticationRepository authenticationRepository = mock(AuthenticationRepository.class);
 
-    private final TiqrService tiqrService = new TiqrService(enrollmentRepository, registrationRepository, new Service(
-            "test",
-            "test",
-            "http://localhost/logo",
-            "http://localhost/info",
-            "http://localhost/authention",
-            "http://localhost/enroll"
-    ), "secret");
+    private final TiqrService tiqrService = new TiqrService(
+            enrollmentRepository,
+            registrationRepository,
+            authenticationRepository,
+            new Service(
+                    "test",
+                    "test",
+                    "http://localhost/logo",
+                    "http://localhost/info",
+                    "http://localhost/authention",
+                    "http://localhost/enroll"
+            ), "secret");
 
     @Test
     void enrollmentScenario() {
