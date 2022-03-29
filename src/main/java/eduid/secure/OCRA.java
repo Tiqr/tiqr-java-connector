@@ -1,4 +1,4 @@
-package eduid.ocra;
+package eduid.secure;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

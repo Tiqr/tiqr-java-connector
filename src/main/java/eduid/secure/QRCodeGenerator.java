@@ -24,7 +24,7 @@ public class QRCodeGenerator {
         ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream, config);
 
-        return String.format(prefix + "%s%s", prefix, Base64.getEncoder().encodeToString(pngOutputStream.toByteArray()));
+        return String.format("%s%s", prefix, Base64.getEncoder().encodeToString(pngOutputStream.toByteArray()));
     }
 
 }

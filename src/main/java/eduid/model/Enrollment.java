@@ -11,10 +11,11 @@ import java.io.Serializable;
 public class Enrollment implements Serializable {
 
     private String key;
-    private String secret;
+    private String enrollmentSecret;
     private String userID;
     private String userDisplayName;
     private EnrollmentStatus status;
+    private String secret;
 
     public Enrollment(String key, String userID, String userDisplayName, EnrollmentStatus status) {
         this.key = key;
@@ -25,6 +26,10 @@ public class Enrollment implements Serializable {
 
     public void update(EnrollmentStatus newStatus) {
         this.status = newStatus;
+    }
+
+    public void setEnrollmentSecret(String enrollmentSecret) {
+        this.enrollmentSecret = enrollmentSecret;
     }
 
     public void setSecret(String secret) {

@@ -8,7 +8,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Getter
 public class Service {
 
-    private final String ocraSuite = "OCRA-1:HOTP-SHA1-6:QH10-S";
+    private final String ocraSuite = "OCRA-1:HOTP-SHA1-6:QN08";
 
     private String displayName;
     private String identifier;
@@ -17,7 +17,7 @@ public class Service {
     private String authenticationUrl;
     private String enrollmentUrl;
 
-    public static Service addSecret(Service baseService, String enrollmentSecret) {
+    public static Service addEnrollmentSecret(Service baseService, String enrollmentSecret) {
         return new Service(
                 baseService.getDisplayName(),
                 baseService.getIdentifier(),
