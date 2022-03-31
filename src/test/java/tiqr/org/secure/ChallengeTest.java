@@ -19,6 +19,12 @@ class ChallengeTest {
     }
 
     @Test
+    void generateSessionKey() {
+        assertTrue(45 <= Challenge.generateSessionKey().length());
+        assertTrue(56 >= Challenge.generateSessionKey().length());
+    }
+
+    @Test
     void verifyOcra() {
         String ocra = OCRA.generateOCRA("sharedSecret", "12345678", "sessionKey");
         Challenge.verifyOcra("sharedSecret", "12345678", "sessionKey", ocra);

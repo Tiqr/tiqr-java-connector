@@ -32,7 +32,15 @@ public class Challenge {
     }
 
     public static String generateNonce() {
-        byte[] aesKey = new byte[64];
+        return generateRandom(64);
+    }
+
+    public static String generateSessionKey() {
+        return generateRandom(32);
+    }
+
+    private static String generateRandom(int length) {
+        byte[] aesKey = new byte[length];
         secureRandom.nextBytes(aesKey);
         String base64 = Base64.getEncoder().encodeToString(aesKey);
         return URLEncoder.encode(base64, Charset.defaultCharset()).replaceAll("%", "");

@@ -6,6 +6,7 @@ import tiqr.org.model.*;
 import tiqr.org.repo.AuthenticationRepository;
 import tiqr.org.repo.EnrollmentRepository;
 import tiqr.org.repo.RegistrationRepository;
+import tiqr.org.secure.Challenge;
 import tiqr.org.secure.OCRA;
 import tiqr.org.secure.SecretCipher;
 
@@ -100,7 +101,11 @@ class TiqrServiceTest {
 
     @Test
     void QRCodeGenerator() {
-        Authentication authentication = new Authentication("user-id", "session-key", "challenge", AuthenticationStatus.SUCCESS);
+        Authentication authentication = new Authentication(
+                "user-id",
+                Challenge.generateSessionKey(),
+                Challenge.generateQH10Challenge(),
+                AuthenticationStatus.SUCCESS);
         when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey())).thenReturn(Optional.of(authentication));
 
         assertThrows(IllegalArgumentException.class, () -> tiqrService.postAuthentication(

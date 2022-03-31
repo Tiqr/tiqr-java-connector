@@ -70,7 +70,7 @@ public class TiqrService {
     public Authentication startAuthentication(String userId) {
         Authentication authentication = new Authentication(
                 userId,
-                Challenge.generateNonce(),
+                Challenge.generateSessionKey(),
                 Challenge.generateQH10Challenge(),
                 AuthenticationStatus.PENDING);
         return authenticationRepository.save(authentication);

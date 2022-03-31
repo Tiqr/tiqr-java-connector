@@ -87,11 +87,12 @@ public class OCRA {
     static public String generateOCRA(String sharedSecret,
                                       String challenge,
                                       String sessionKey) {
-        return generateOCRA("OCRA-1:HOTP-SHA1-6:QH10",
+        return generateOCRA("OCRA-1:HOTP-SHA1-6:QH10-S064",
                 Hex.encodeHexString(sharedSecret.getBytes(StandardCharsets.UTF_8)),
                 null,
                 Hex.encodeHexString(challenge.getBytes(StandardCharsets.UTF_8)),
                 null,
+                //As we use S064 we must ensure we avoid indexOutOfBounds for longer session keys
                 Hex.encodeHexString(sessionKey.getBytes(StandardCharsets.UTF_8)),
                 null);
     }
