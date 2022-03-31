@@ -38,9 +38,12 @@ public class Challenge {
         return URLEncoder.encode(base64, Charset.defaultCharset()).replaceAll("%", "");
     }
 
-    public static boolean verifyOcra(String secret, String challenge, String expectedOcra) {
+    public static void verifyOcra(String secret, String challenge, String expectedOcra) {
         String ocra = OCRA.generateOCRA(secret, challenge);
-        return MessageDigest.isEqual(ocra.getBytes(StandardCharsets.UTF_8), expectedOcra.getBytes(StandardCharsets.UTF_8));
+        boolean equals = MessageDigest.isEqual(ocra.getBytes(StandardCharsets.UTF_8), expectedOcra.getBytes(StandardCharsets.UTF_8));
+        if (!equals) {
+            throw new IllegalArgumentException(String.format("Response does not match. Expected %s, but got %s", expectedOcra, ocra));
+        }
     }
 
 

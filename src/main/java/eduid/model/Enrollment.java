@@ -15,7 +15,6 @@ public class Enrollment implements Serializable {
     private String userID;
     private String userDisplayName;
     private EnrollmentStatus status;
-    private String secret;
 
     public Enrollment(String key, String userID, String userDisplayName, EnrollmentStatus status) {
         this.key = key;

@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Authentication {
 
     private String userID;
-    private String userDisplayName;
     private String sessionKey;
     private String challenge;
     private AuthenticationStatus status;

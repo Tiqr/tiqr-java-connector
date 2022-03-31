@@ -17,6 +17,9 @@ public class QRCodeGenerator {
     private final static MatrixToImageConfig config = new MatrixToImageConfig(MatrixToImageConfig.BLACK, MatrixToImageConfig.WHITE);
     private final static String prefix = "data:image/png;base64,";
 
+    private QRCodeGenerator() {
+    }
+
     public static String generateQRCodeImage(String text) throws WriterException, IOException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 265, 265);

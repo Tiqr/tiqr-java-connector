@@ -67,23 +67,36 @@ public class TiqrService {
         return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new).getStatus();
     }
 
-    public Authentication startAuthentication(String userId, String userDisplayName) {
+    public Authentication startAuthentication(String userId) {
         Authentication authentication = new Authentication(
                 userId,
-                userDisplayName,
                 Challenge.generateNonce(),
                 Challenge.generateQN08Challenge(),
                 AuthenticationStatus.PENDING);
         return authenticationRepository.save(authentication);
     }
 
+    public void postAuthentication(AuthenticationData authenticationData) {
+        Authentication authentication = authenticationRepository.findAuthenticationBySessionKey(authenticationData.getSessionKey()).orElseThrow(IllegalArgumentException::new);
+        if (!authentication.getStatus().equals(AuthenticationStatus.PENDING)) {
+            throw new IllegalArgumentException("Authentication can only be called when the status is PENDING. Current status is " + authentication.getStatus());
+        }
+
+        Registration registration = registrationRepository.findRegistrationByUserId(authentication.getUserID()).orElseThrow(IllegalArgumentException::new);
+        String decryptedSecret = secretCipher.decrypt(registration.getSecret());
+        Challenge.verifyOcra(decryptedSecret, authentication.getChallenge(), authenticationData.getResponse());
+
+        registration.setNotificationAddress(authenticationData.getNotificationAddress());
+
+        registrationRepository.save(registration);
+
+        authentication.update(AuthenticationStatus.SUCCESS);
+        authenticationRepository.save(authentication);
+    }
+
     public AuthenticationStatus authenticationStatus(String sessionKey) {
         return authenticationRepository.findAuthenticationBySessionKey(sessionKey).orElseThrow(IllegalArgumentException::new).getStatus();
     }
 
-    public Authentication authenticate() {
-        //todo find registration by user id and update notificationAddress
-        return null;
-    }
 
 }

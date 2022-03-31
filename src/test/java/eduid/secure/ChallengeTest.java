@@ -20,6 +20,8 @@ class ChallengeTest {
     @Test
     void verifyOcra() {
         String ocra = OCRA.generateOCRA("sharedSecret", "12345678");
-        assertTrue(Challenge.verifyOcra("sharedSecret", "12345678", ocra));
+        Challenge.verifyOcra("sharedSecret", "12345678", ocra);
+
+        assertThrows(IllegalArgumentException.class, () -> Challenge.verifyOcra("sharedSecret", "12345678", "nope"));
     }
 }

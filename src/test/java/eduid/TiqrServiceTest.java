@@ -4,6 +4,7 @@ import eduid.model.*;
 import eduid.repo.AuthenticationRepository;
 import eduid.repo.EnrollmentRepository;
 import eduid.repo.RegistrationRepository;
+import eduid.secure.OCRA;
 import eduid.secure.SecretCipher;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -40,7 +41,7 @@ class TiqrServiceTest {
         when(enrollmentRepository.save(any(Enrollment.class))).thenAnswer(i -> i.getArguments()[0]);
         Enrollment enrollment = tiqrService.startEnrollment("user-id", "John Doe");
 
-        assertEquals(EnrollmentStatus.INITIALIZED.getValue(), enrollment.getStatus().getValue());
+        assertEquals(EnrollmentStatus.INITIALIZED, enrollment.getStatus());
         assertNotNull(enrollment.getKey());
 
         when(enrollmentRepository.findEnrollmentByKey(enrollment.getKey())).thenReturn(Optional.of(enrollment));
@@ -61,6 +62,23 @@ class TiqrServiceTest {
 
         SecretCipher cipher = new SecretCipher("secret");
         assertEquals(result.getSecret(), cipher.encrypt("sharedSecret"));
+
+        when(authenticationRepository.save(any(Authentication.class))).thenAnswer(i -> i.getArguments()[0]);
+        Authentication authentication = tiqrService.startAuthentication("user-id");
+
+        when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey()))
+                .thenReturn(Optional.of(authentication));
+        assertEquals(AuthenticationStatus.PENDING, tiqrService.authenticationStatus(authentication.getSessionKey()));
+
+        when(registrationRepository.findRegistrationByUserId(authentication.getUserID()))
+                .thenReturn(Optional.of(registration));
+        AuthenticationData authenticationData = new AuthenticationData(
+                authentication.getSessionKey(),
+                OCRA.generateOCRA("sharedSecret", authentication.getChallenge()),
+                "987654321"
+        );
+        tiqrService.postAuthentication(authenticationData);
+        assertEquals(AuthenticationStatus.SUCCESS, tiqrService.authenticationStatus(authentication.getSessionKey()));
     }
 
     @Test
@@ -78,6 +96,15 @@ class TiqrServiceTest {
 
         Registration registration = getRegistration(enrollment.getEnrollmentSecret());
         assertThrows(IllegalArgumentException.class, () -> tiqrService.enrollData(registration));
+    }
+
+    @Test
+    void QRCodeGenerator() {
+        Authentication authentication = new Authentication("user-id","session-key", "challenge", AuthenticationStatus.SUCCESS);
+        when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey())).thenReturn(Optional.of(authentication));
+
+        assertThrows(IllegalArgumentException.class, () -> tiqrService.postAuthentication(
+                new AuthenticationData(authentication.getSessionKey(),authentication.getChallenge(),"notificationAddress")));
     }
 
     private Registration getRegistration(String enrollmentSecret) {

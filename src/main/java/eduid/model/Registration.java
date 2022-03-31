@@ -21,4 +21,8 @@ public class Registration {
     public void setSecret(String secret) {
         this.secret = secret;
     }
+
+    public void setNotificationAddress(String notificationAddress) {
+        this.notificationAddress = notificationAddress;
+    }
 }
