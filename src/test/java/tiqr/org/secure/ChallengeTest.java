@@ -7,8 +7,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class ChallengeTest {
 
     @Test
-    void generateQH08Challenge() {
-        assertEquals(8, Challenge.generateQN08Challenge().length());
+    void generateQH10Challenge() {
+        String s = Challenge.generateQH10Challenge();
+        assertEquals(10, s.length());
     }
 
     @Test

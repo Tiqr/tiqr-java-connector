@@ -10,7 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Getter
 public class Service {
 
-    private final String ocraSuite = "OCRA-1:HOTP-SHA1-6:QN08";
+    private final String ocraSuite = "OCRA-1:HOTP-SHA1-6:QH10";
 
     private String displayName;
     private String identifier;

@@ -77,21 +77,22 @@ public class OCRA {
     }
 
     /**
-     * This method generates an OCRA HOTP value for the QN08 variant
+     * This method generates an OCRA HOTP value for the QH10 variant
      *
      * @param sharedSecret the shared secret between the two parties
-     * @param challenge    the 8-numeric challenge question
+     * @param challenge    the hexed 10 challenge question
+     * @param sessionKey   the sessionKey
      * @return A numeric String in base 10 that includes truncationDigits digits
      */
     static public String generateOCRA(String sharedSecret,
                                       String challenge,
                                       String sessionKey) {
-        return generateOCRA("OCRA-1:HOTP-SHA1-6:QN08",
+        return generateOCRA("OCRA-1:HOTP-SHA1-6:QH10",
                 Hex.encodeHexString(sharedSecret.getBytes(StandardCharsets.UTF_8)),
                 null,
                 Hex.encodeHexString(challenge.getBytes(StandardCharsets.UTF_8)),
                 null,
-                sessionKey,
+                Hex.encodeHexString(sessionKey.getBytes(StandardCharsets.UTF_8)),
                 null);
     }
 
@@ -113,12 +114,12 @@ public class OCRA {
      * @return A numeric String in base 10 that includes truncationDigits digits
      */
     static public String generateOCRA(String ocraSuite,
-                                       String key,
-                                       String counter,
-                                       String question,
-                                       String password,
-                                       String sessionInformation,
-                                       String timeStamp) {
+                                      String key,
+                                      String counter,
+                                      String question,
+                                      String password,
+                                      String sessionInformation,
+                                      String timeStamp) {
         int codeDigits;
         String crypto = "";
         int ocraSuiteLength = (ocraSuite.getBytes()).length;

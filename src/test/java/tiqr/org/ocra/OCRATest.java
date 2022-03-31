@@ -17,14 +17,14 @@ class OCRATest {
     @Test
     void generateOCRA() {
         String result = OCRA.generateOCRA(
-                "OCRA-1:HOTP-SHA1-6:QN08",
+                "OCRA-1:HOTP-SHA1-6:QH10",
                 hexString("secret"),
                 hexString("counter"),
                 hexString("question"),
                 hexString("password"),
                 hexString("sessionInformation"),
                 hexString("timestamp"));
-        assertEquals("380884", result);
+        assertEquals("326413", result);
 
         String other = OCRA.generateOCRA("secret", "question", "sessionInformation");
         assertEquals(result, other);

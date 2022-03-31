@@ -71,7 +71,7 @@ public class TiqrService {
         Authentication authentication = new Authentication(
                 userId,
                 Challenge.generateNonce(),
-                Challenge.generateQN08Challenge(),
+                Challenge.generateQH10Challenge(),
                 AuthenticationStatus.PENDING);
         return authenticationRepository.save(authentication);
     }

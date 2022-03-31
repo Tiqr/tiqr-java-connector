@@ -24,10 +24,10 @@ public class Challenge {
     private Challenge() {
     }
 
-    public static String generateQN08Challenge() {
-        return secureRandom.ints(8, 0, 10)
+    public static String generateQH10Challenge() {
+        return secureRandom.ints(10, 0, 16)
                 .boxed()
-                .map(Object::toString)
+                .map(Integer::toHexString)
                 .collect(Collectors.joining());
     }
 
