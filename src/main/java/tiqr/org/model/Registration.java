@@ -18,6 +18,11 @@ public class Registration {
     private String version;
     private String operation;
 
+    public Registration(String userid, String notificationAddress) {
+        this.userid = userid;
+        this.notificationAddress = notificationAddress;
+    }
+
     public void setSecret(String secret) {
         this.secret = secret;
     }

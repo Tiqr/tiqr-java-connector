@@ -7,17 +7,18 @@ import com.eatthepath.pushy.apns.auth.ApnsSigningKey;
 import com.eatthepath.pushy.apns.util.ApnsPayloadBuilder;
 import com.eatthepath.pushy.apns.util.SimpleApnsPayloadBuilder;
 import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
-import com.eatthepath.pushy.apns.util.concurrent.PushNotificationFuture;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.io.Resource;
+import tiqr.org.model.Registration;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
-public class APNS {
+public class APNS implements PushNotifier {
 
     private static final Log LOG = LogFactory.getLog(APNS.class);
 
@@ -41,14 +42,29 @@ public class APNS {
         this.apnsClient = apnsClientBuilder.build();
     }
 
-    public PushNotificationFuture<SimpleApnsPushNotification, PushNotificationResponse<SimpleApnsPushNotification>>
-            push(String notificationAddress) {
+    public String push(Registration registration) {
+        String notificationAddress = registration.getNotificationAddress();
+        String userId = registration.getUserid();
+
         ApnsPayloadBuilder payloadBuilder = new SimpleApnsPayloadBuilder();
         payloadBuilder.setCategoryName("tiqr");
 
         String payload = payloadBuilder.build();
         SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(notificationAddress, "tiqr", payload);
 
-        return this.apnsClient.sendNotification(pushNotification);
+        try {
+            PushNotificationResponse<SimpleApnsPushNotification> response = this.apnsClient.sendNotification(pushNotification).get();
+            if (response == null || !response.isAccepted()) {
+                throw new PushNotificationException(String.format(
+                        "Error in push notification APNS for user % and token %s", userId, notificationAddress
+                ));
+            }
+            LOG.info(String.format("Push notification APNS send for user %s and token %s", userId, notificationAddress));
+            return response.getApnsId().toString();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new PushNotificationException(String.format(
+                    "Error in push notification APNS for user % and token %s", userId, notificationAddress
+            ), e);
+        }
     }
 }
