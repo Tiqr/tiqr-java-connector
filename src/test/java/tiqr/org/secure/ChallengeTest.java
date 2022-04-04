@@ -2,7 +2,8 @@ package tiqr.org.secure;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ChallengeTest {
 
@@ -14,21 +15,23 @@ class ChallengeTest {
 
     @Test
     void generateNonce() {
-        assertTrue(90 <= Challenge.generateNonce().length());
-        assertTrue(102 >= Challenge.generateNonce().length());
+        assertEquals(128, Challenge.generateNonce().length());
     }
 
     @Test
     void generateSessionKey() {
-        assertTrue(45 <= Challenge.generateSessionKey().length());
-        assertTrue(56 >= Challenge.generateSessionKey().length());
+        assertEquals(64, Challenge.generateSessionKey().length());
     }
 
     @Test
     void verifyOcra() {
-        String ocra = OCRA.generateOCRA("sharedSecret", "12345678", "sessionKey");
-        Challenge.verifyOcra("sharedSecret", "12345678", "sessionKey", ocra);
+        String sharedSecret = Challenge.generateNonce();
+        String challenge = Challenge.generateQH10Challenge();
+        String sessionKey = Challenge.generateSessionKey();
 
-        assertThrows(IllegalArgumentException.class, () -> Challenge.verifyOcra("sharedSecret", "12345678", "sessionKey", "nope"));
+        String ocra = OCRA.generateOCRA(sharedSecret, challenge, sessionKey);
+        Challenge.verifyOcra(sharedSecret, challenge, sessionKey, ocra);
+
+        assertThrows(IllegalArgumentException.class, () -> Challenge.verifyOcra(sharedSecret, challenge, sessionKey, "nope"));
     }
 }

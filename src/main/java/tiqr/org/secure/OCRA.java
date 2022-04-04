@@ -1,11 +1,8 @@
 package tiqr.org.secure;
 
-import org.apache.commons.codec.binary.Hex;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -79,8 +76,8 @@ public class OCRA {
     /**
      * This method generates an OCRA HOTP value for the QH10 variant
      *
-     * @param sharedSecret the shared secret between the two parties
-     * @param challenge    the hexed 10 challenge question
+     * @param sharedSecret the shared secret between the two parties hex encoded
+     * @param challenge    the 10 challenge question with hex-decimal characters
      * @param sessionKey   the sessionKey
      * @return A numeric String in base 10 that includes truncationDigits digits
      */
@@ -88,12 +85,12 @@ public class OCRA {
                                       String challenge,
                                       String sessionKey) {
         return generateOCRA("OCRA-1:HOTP-SHA1-6:QH10-S064",
-                Hex.encodeHexString(sharedSecret.getBytes(StandardCharsets.UTF_8)),
+                sharedSecret,
                 null,
-                Hex.encodeHexString(challenge.getBytes(StandardCharsets.UTF_8)),
+                challenge,
                 null,
                 //As we use S064 we must ensure we avoid indexOutOfBounds for longer session keys
-                Hex.encodeHexString(sessionKey.getBytes(StandardCharsets.UTF_8)),
+                sessionKey,
                 null);
     }
 

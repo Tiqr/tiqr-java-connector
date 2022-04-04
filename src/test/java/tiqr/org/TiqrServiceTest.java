@@ -24,6 +24,8 @@ class TiqrServiceTest {
     private final RegistrationRepository registrationRepository = mock(RegistrationRepository.class);
     private final AuthenticationRepository authenticationRepository = mock(AuthenticationRepository.class);
 
+    private final String sharedSecret = Challenge.generateNonce();
+
     private final TiqrService tiqrService = new TiqrService(
             enrollmentRepository,
             registrationRepository,
@@ -62,7 +64,7 @@ class TiqrServiceTest {
         Registration result = tiqrService.enrollData(registration);
 
         SecretCipher cipher = new SecretCipher("secret");
-        assertEquals(result.getSecret(), cipher.encrypt("sharedSecret"));
+        assertEquals(result.getSecret(), cipher.encrypt(sharedSecret));
 
         when(authenticationRepository.save(any(Authentication.class))).thenAnswer(i -> i.getArguments()[0]);
         Authentication authentication = tiqrService.startAuthentication("user-id");
@@ -75,7 +77,7 @@ class TiqrServiceTest {
                 .thenReturn(Optional.of(registration));
         AuthenticationData authenticationData = new AuthenticationData(
                 authentication.getSessionKey(),
-                OCRA.generateOCRA("sharedSecret", authentication.getChallenge(), authentication.getSessionKey()),
+                OCRA.generateOCRA(sharedSecret, authentication.getChallenge(), authentication.getSessionKey()),
                 "987654321"
         );
         tiqrService.postAuthentication(authenticationData);
@@ -113,7 +115,7 @@ class TiqrServiceTest {
     }
 
     private Registration getRegistration(String enrollmentSecret) {
-        return new Registration("user-id", "sharedSecret", enrollmentSecret, "nl", "APNS", "123456", "2", "register");
+        return new Registration("user-id", sharedSecret, enrollmentSecret, "nl", "APNS", "123456", "2", "register");
     }
 
 

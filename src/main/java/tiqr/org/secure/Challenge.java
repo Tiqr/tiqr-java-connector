@@ -1,12 +1,11 @@
 package tiqr.org.secure;
 
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
+import org.apache.commons.codec.binary.Hex;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.stream.Collectors;
 
 public class Challenge {
@@ -42,8 +41,7 @@ public class Challenge {
     private static String generateRandom(int length) {
         byte[] bytes = new byte[length];
         secureRandom.nextBytes(bytes);
-        String base64 = Base64.getEncoder().encodeToString(bytes);
-        return URLEncoder.encode(base64, Charset.defaultCharset()).replaceAll("%", "");
+        return Hex.encodeHexString(bytes);
     }
 
     public static void verifyOcra(String secret, String challenge, String sessionKey, String expectedOcra) {
