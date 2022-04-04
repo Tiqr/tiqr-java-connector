@@ -100,7 +100,7 @@ class TiqrServiceTest {
     }
 
     @Test
-    void QRCodeGenerator() {
+    void ensurePendingStatus() {
         Authentication authentication = new Authentication(
                 "user-id",
                 Challenge.generateSessionKey(),

@@ -40,9 +40,9 @@ public class Challenge {
     }
 
     private static String generateRandom(int length) {
-        byte[] aesKey = new byte[length];
-        secureRandom.nextBytes(aesKey);
-        String base64 = Base64.getEncoder().encodeToString(aesKey);
+        byte[] bytes = new byte[length];
+        secureRandom.nextBytes(bytes);
+        String base64 = Base64.getEncoder().encodeToString(bytes);
         return URLEncoder.encode(base64, Charset.defaultCharset()).replaceAll("%", "");
     }
 
