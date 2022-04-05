@@ -1,6 +1,5 @@
 package tiqr.org.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -16,7 +15,7 @@ public class Registration {
     @Id
     private String id;
 
-    private String userid;
+    private String userId;
     private String secret;
     private String enrollmentSecret;
     private String language;
@@ -28,7 +27,7 @@ public class Registration {
     private Instant updated;
 
     public Registration(String userid, String notificationAddress) {
-        this.userid = userid;
+        this.userId = userid;
         this.notificationAddress = notificationAddress;
         this.created = Instant.now();
         this.updated = Instant.now();
@@ -42,7 +41,7 @@ public class Registration {
                         String notificationAddress,
                         String version,
                         String operation) {
-        this.userid = userid;
+        this.userId = userid;
         this.secret = sharedSecret;
         this.enrollmentSecret = enrollmentSecret;
         this.language = language;
