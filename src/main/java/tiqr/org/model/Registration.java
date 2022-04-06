@@ -62,4 +62,8 @@ public class Registration {
         this.notificationAddress = notificationAddress;
         this.updated = Instant.now();
     }
+
+    public void setEnrollmentSecret(String enrollmentSecret) {
+        this.enrollmentSecret = enrollmentSecret;
+    }
 }

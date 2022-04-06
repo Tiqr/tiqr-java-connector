@@ -10,7 +10,7 @@
 
     <groupId>org.openconext</groupId>
     <artifactId>tiqr-java-connector</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.6-SNAPSHOT</version>
     <name>tiqr-java-connector</name>
 
     <dependencies>
@@ -159,6 +159,19 @@
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
