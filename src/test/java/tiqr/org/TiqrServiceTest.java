@@ -42,7 +42,8 @@ class TiqrServiceTest {
     @Test
     void enrollmentScenario() {
         when(enrollmentRepository.save(any(Enrollment.class))).thenAnswer(i -> i.getArguments()[0]);
-        Enrollment enrollment = tiqrService.startEnrollment("user-id", "John Doe");
+        String userId = "user-id";
+        Enrollment enrollment = tiqrService.startEnrollment(userId, "John Doe");
 
         assertEquals(EnrollmentStatus.INITIALIZED, enrollment.getStatus());
         assertNotNull(enrollment.getKey());
@@ -67,7 +68,7 @@ class TiqrServiceTest {
         assertEquals(result.getSecret(), cipher.encrypt(sharedSecret));
 
         when(authenticationRepository.save(any(Authentication.class))).thenAnswer(i -> i.getArguments()[0]);
-        Authentication authentication = tiqrService.startAuthentication("user-id");
+        Authentication authentication = tiqrService.startAuthentication(userId);
 
         when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey()))
                 .thenReturn(Optional.of(authentication));
@@ -77,8 +78,12 @@ class TiqrServiceTest {
                 .thenReturn(Optional.of(registration));
         AuthenticationData authenticationData = new AuthenticationData(
                 authentication.getSessionKey(),
+                userId,
                 OCRA.generateOCRA(sharedSecret, authentication.getChallenge(), authentication.getSessionKey()),
-                "987654321"
+                "nl",
+                "login",
+                "APNS",
+                "01234567890"
         );
         tiqrService.postAuthentication(authenticationData);
         assertEquals(AuthenticationStatus.SUCCESS, tiqrService.authenticationStatus(authentication.getSessionKey()));
@@ -111,7 +116,14 @@ class TiqrServiceTest {
         when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey())).thenReturn(Optional.of(authentication));
 
         assertThrows(IllegalArgumentException.class, () -> tiqrService.postAuthentication(
-                new AuthenticationData(authentication.getSessionKey(), authentication.getChallenge(), "notificationAddress")));
+                new AuthenticationData(
+                        authentication.getSessionKey(),
+                        "N/A",
+                        authentication.getChallenge(),
+                        "en",
+                        "login",
+                        "APNS",
+                        "notificationAddress")));
     }
 
     private Registration getRegistration(String enrollmentSecret) {
