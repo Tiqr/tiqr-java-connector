@@ -88,7 +88,9 @@ public class TiqrService {
     }
 
     public void postAuthentication(AuthenticationData authenticationData) {
-        Authentication authentication = authenticationRepository.findAuthenticationBySessionKey(authenticationData.getSessionKey()).orElseThrow(IllegalArgumentException::new);
+        Authentication authentication = authenticationRepository.findAuthenticationBySessionKey(authenticationData.getSessionKey())
+                .orElseThrow(IllegalArgumentException::new);
+
         if (!authentication.getStatus().equals(AuthenticationStatus.PENDING)) {
             throw new IllegalArgumentException("Authentication can only be called when the status is PENDING. Current status is " + authentication.getStatus());
         }
