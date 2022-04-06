@@ -7,6 +7,8 @@ import tiqr.org.repo.RegistrationRepository;
 import tiqr.org.secure.Challenge;
 import tiqr.org.secure.SecretCipher;
 
+import java.time.Instant;
+
 public class TiqrService {
 
     private final EnrollmentRepository enrollmentRepository;
@@ -56,9 +58,9 @@ public class TiqrService {
             throw new IllegalArgumentException("Enrollment can only be called when the status is RETRIEVED. Current status is " + enrollment.getStatus());
         }
 
-        if (!enrollment.getUserID().equals(registration.getUserId())) {
+        if (!enrollment.getUserID().equals(registration.getUserid())) {
             throw new IllegalArgumentException(String.format("Enrollment has different userID (%s) then Registration (%s)",
-                    enrollment.getUserID(), registration.getUserId()));
+                    enrollment.getUserID(), registration.getUserid()));
 
         }
 
@@ -66,6 +68,8 @@ public class TiqrService {
         enrollmentRepository.save(enrollment);
 
         registration.setSecret(secretCipher.encrypt(registration.getSecret()));
+        registration.setCreated(Instant.now());
+        registration.setUpdated(Instant.now());
         return registrationRepository.save(registration);
     }
 
@@ -93,6 +97,7 @@ public class TiqrService {
         Challenge.verifyOcra(decryptedSecret, authentication.getChallenge(), authentication.getSessionKey(), authenticationData.getResponse());
 
         registration.setNotificationAddress(authenticationData.getNotificationAddress());
+        registration.setUpdated(Instant.now());
 
         registrationRepository.save(registration);
 

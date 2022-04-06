@@ -1,7 +1,6 @@
 package tiqr.org.model;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -9,7 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 
 @Getter
-@NoArgsConstructor
 @Document(collection = "registrations")
 @Setter
 public class Registration {
@@ -17,7 +15,7 @@ public class Registration {
     @Id
     private String id;
 
-    private String userId;
+    private String userid;
     private String secret;
     private String enrollmentSecret;
     private String language;
@@ -28,11 +26,12 @@ public class Registration {
     private Instant created;
     private Instant updated;
 
+    public Registration() {
+        this(null, null);
+    }
+
     public Registration(String userid, String notificationAddress) {
-        this.userId = userid;
-        this.notificationAddress = notificationAddress;
-        this.created = Instant.now();
-        this.updated = Instant.now();
+        this(userid, notificationAddress, null, null, null, null, null, null);
     }
 
     public Registration(String userid,
@@ -43,7 +42,7 @@ public class Registration {
                         String notificationAddress,
                         String version,
                         String operation) {
-        this.userId = userid;
+        this.userid = userid;
         this.secret = sharedSecret;
         this.enrollmentSecret = enrollmentSecret;
         this.language = language;
@@ -52,21 +51,6 @@ public class Registration {
         this.version = version;
         this.operation = operation;
         this.created = Instant.now();
-        this.updated = Instant.now();
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret;
-        this.updated = Instant.now();
-    }
-
-    public void setNotificationAddress(String notificationAddress) {
-        this.notificationAddress = notificationAddress;
-        this.updated = Instant.now();
-    }
-
-    public void setEnrollmentSecret(String enrollmentSecret) {
-        this.enrollmentSecret = enrollmentSecret;
         this.updated = Instant.now();
     }
 }

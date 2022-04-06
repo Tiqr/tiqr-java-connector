@@ -44,7 +44,7 @@ public class APNS implements PushNotifier {
 
     public String push(Registration registration) {
         String notificationAddress = registration.getNotificationAddress();
-        String userId = registration.getUserId();
+        String userId = registration.getUserid();
 
         ApnsPayloadBuilder payloadBuilder = new SimpleApnsPayloadBuilder();
         payloadBuilder.setCategoryName("tiqr");

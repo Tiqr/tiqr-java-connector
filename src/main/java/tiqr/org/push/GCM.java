@@ -33,7 +33,7 @@ public class GCM implements PushNotifier {
 
     public String push(Registration registration) {
         String notificationAddress = registration.getNotificationAddress();
-        String userId = registration.getUserId();
+        String userId = registration.getUserid();
 
         Notification notification = Notification.builder().setBody("tiqr-java-connector").build();
         Message message = Message
