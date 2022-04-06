@@ -1,10 +1,13 @@
 package tiqr.org.ocra;
 
+import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.Test;
 import tiqr.org.secure.Challenge;
 import tiqr.org.secure.OCRA;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,25 +37,29 @@ class OCRATest {
 
     @Test
     void validateInput() {
-        inputList.forEach(input -> {
-            assertEquals(input.expectedOcra, OCRA.generateOCRA(sharedSecret, input.challenge, input.sessionInformation));
-            assertEquals(input.expectedOcra, OCRA.generateOCRA(
-                    "OCRA-1:HOTP-SHA1-6:QH10-S064",
-                    sharedSecret,
-                    null,
-                    input.challenge,
-                    null,
-                    input.sessionInformation,
-                    null));
-        });
+        inputList.forEach(input -> assertEquals(input.expectedOcra, verifyOcra(sharedSecret, input.challenge, input.sessionInformation)));
     }
 
     @Test
-    void generateOCRA() {
+    void generateOCRAWithDefaults() {
         String sharedSecret = Challenge.generateNonce();
         String challenge = Challenge.generateQH10Challenge();
         String sessionInformation = Challenge.generateSessionKey();
 
+        verifyOcra(sharedSecret, challenge, sessionInformation);
+    }
+
+    @Test
+    void generateOCRAWithUUID() {
+        String sharedSecret = Challenge.generateNonce();
+        String challenge = Challenge.generateQH10Challenge();
+        String sessionInformation = UUID.randomUUID().toString();
+        String sessionInformationHex = Hex.encodeHexString(sessionInformation.getBytes(StandardCharsets.UTF_8));
+
+        verifyOcra(sharedSecret, challenge, sessionInformationHex);
+    }
+
+    private String verifyOcra(String sharedSecret, String challenge, String sessionInformation) {
         String other = OCRA.generateOCRA(sharedSecret, challenge, sessionInformation);
         String result = OCRA.generateOCRA(
                 "OCRA-1:HOTP-SHA1-6:QH10-S064",
@@ -64,6 +71,7 @@ class OCRATest {
                 null);
 
         assertEquals(result, other);
+        return result;
     }
 
     private class Input {
