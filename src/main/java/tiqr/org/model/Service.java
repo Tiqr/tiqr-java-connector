@@ -3,11 +3,13 @@ package tiqr.org.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 public class Service {
 
     private final String ocraSuite = "OCRA-1:HOTP-SHA1-6:QH10-S064";
