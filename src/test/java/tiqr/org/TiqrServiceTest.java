@@ -73,7 +73,7 @@ class TiqrServiceTest {
                 .thenReturn(Optional.of(authentication));
         assertEquals(AuthenticationStatus.PENDING, tiqrService.authenticationStatus(authentication.getSessionKey()));
 
-        when(registrationRepository.findRegistrationByUserId(authentication.getUserID()))
+        when(registrationRepository.findRegistrationByUserid(authentication.getUserID()))
                 .thenReturn(Optional.of(registration));
         AuthenticationData authenticationData = new AuthenticationData(
                 authentication.getSessionKey(),

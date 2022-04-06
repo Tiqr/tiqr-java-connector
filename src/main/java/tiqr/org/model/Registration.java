@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.util.Assert;
 
 import java.time.Instant;
 
@@ -52,5 +53,11 @@ public class Registration {
         this.operation = operation;
         this.created = Instant.now();
         this.updated = Instant.now();
+    }
+
+    public void validateForInitialEnrollment() {
+        Assert.hasLength(userid, "userid is empty");
+        Assert.hasLength(enrollmentSecret, "enrollmentSecret is empty");
+        Assert.hasLength(notificationAddress, "notificationAddress is empty");
     }
 }

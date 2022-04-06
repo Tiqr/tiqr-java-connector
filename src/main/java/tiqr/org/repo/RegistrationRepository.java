@@ -8,5 +8,5 @@ public interface RegistrationRepository {
 
     Registration save(Registration registration);
 
-    Optional<Registration> findRegistrationByUserId(String userId);
+    Optional<Registration> findRegistrationByUserid(String userId);
 }

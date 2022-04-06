@@ -63,6 +63,7 @@ public class TiqrService {
                     enrollment.getUserID(), registration.getUserid()));
 
         }
+        registration.validateForInitialEnrollment();
 
         enrollment.update(EnrollmentStatus.PROCESSED);
         enrollmentRepository.save(enrollment);
@@ -92,7 +93,7 @@ public class TiqrService {
             throw new IllegalArgumentException("Authentication can only be called when the status is PENDING. Current status is " + authentication.getStatus());
         }
 
-        Registration registration = registrationRepository.findRegistrationByUserId(authentication.getUserID()).orElseThrow(IllegalArgumentException::new);
+        Registration registration = registrationRepository.findRegistrationByUserid(authentication.getUserID()).orElseThrow(IllegalArgumentException::new);
         String decryptedSecret = secretCipher.decrypt(registration.getSecret());
         Challenge.verifyOcra(decryptedSecret, authentication.getChallenge(), authentication.getSessionKey(), authenticationData.getResponse());
 
