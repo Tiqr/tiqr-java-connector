@@ -31,7 +31,7 @@ public class Registration {
     }
 
     public Registration(String userid, String notificationAddress) {
-        this(userid, notificationAddress, null, null, null, null, null, null);
+        this(userid, null, null, null, null, notificationAddress, null, null);
     }
 
     public Registration(String userid,
