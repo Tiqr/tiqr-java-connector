@@ -8,6 +8,7 @@ import tiqr.org.secure.Challenge;
 import tiqr.org.secure.SecretCipher;
 
 import java.time.Instant;
+import java.util.Optional;
 
 public class TiqrService {
 
@@ -63,14 +64,17 @@ public class TiqrService {
 
         registration.validateForInitialEnrollment();
 
-        enrollment.update(EnrollmentStatus.PROCESSED);
-        enrollmentRepository.save(enrollment);
-
         registration.setSecret(secretCipher.encrypt(registration.getSecret()));
         Instant now = Instant.now();
         registration.setCreated(now);
         registration.setUpdated(now);
-        return registrationRepository.save(registration);
+
+        Registration savedRegistration = registrationRepository.save(registration);
+
+        enrollment.update(EnrollmentStatus.PROCESSED);
+        enrollmentRepository.save(enrollment);
+
+        return savedRegistration;
     }
 
     public Enrollment enrollmentStatus(String enrollmentKey) {
