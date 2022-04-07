@@ -24,12 +24,14 @@ public class Registration {
     private String notificationType;
     private String notificationAddress;
     private String operation;
+    private RegistrationStatus status;
     private Instant created;
     private Instant updated;
 
     public void validateForInitialEnrollment() {
         validateForPushNotification();
         Assert.hasLength(enrollmentSecret, "enrollmentSecret is empty");
+        Assert.notNull(status, "status is null");
     }
 
     public void validateForPushNotification() {

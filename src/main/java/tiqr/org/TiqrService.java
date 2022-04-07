@@ -8,7 +8,6 @@ import tiqr.org.secure.Challenge;
 import tiqr.org.secure.SecretCipher;
 
 import java.time.Instant;
-import java.util.Optional;
 
 public class TiqrService {
 
@@ -61,6 +60,7 @@ public class TiqrService {
 
         registration.setUserId(enrollment.getUserID());
         registration.setUserDisplayName(enrollment.getUserDisplayName());
+        registration.setStatus(RegistrationStatus.INITIALIZED);
 
         registration.validateForInitialEnrollment();
 
@@ -77,11 +77,23 @@ public class TiqrService {
         return savedRegistration;
     }
 
+    public Registration finishRegistration(String userId) {
+        Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
+        registration.setStatus(RegistrationStatus.FINALIZED);
+        return registrationRepository.save(registration);
+    }
+
     public Enrollment enrollmentStatus(String enrollmentKey) {
         return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
     }
 
     public Authentication startAuthentication(String userId, String userDisplayName, boolean sendPushNotification) {
+        Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
+
+        if (!RegistrationStatus.FINALIZED.equals(registration.getStatus()) ) {
+            throw new IllegalArgumentException("Registration is not finished");
+        }
+
         Authentication authentication = new Authentication(
                 userId,
                 userDisplayName,

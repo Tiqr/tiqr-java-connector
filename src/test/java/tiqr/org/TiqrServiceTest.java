@@ -68,6 +68,12 @@ class TiqrServiceTest {
         SecretCipher cipher = new SecretCipher("secret");
         assertEquals(result.getSecret(), cipher.encrypt(sharedSecret));
 
+        when(registrationRepository.findRegistrationByUserId(userId))
+                .thenReturn(Optional.of(registration));
+        assertThrows(IllegalArgumentException.class, () -> tiqrService.startAuthentication(userId, "John Doe", false));
+
+        tiqrService.finishRegistration(userId);
+
         when(authenticationRepository.save(any(Authentication.class))).thenAnswer(i -> i.getArguments()[0]);
         Authentication authentication = tiqrService.startAuthentication(userId, "John Doe", false);
 
