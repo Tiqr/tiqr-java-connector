@@ -56,7 +56,7 @@ class TiqrServiceTest {
                 .getFirst("enrollment_secret");
         assertNotNull(enrollmentSecret);
 
-        assertEquals(EnrollmentStatus.RETRIEVED, tiqrService.enrollmentStatus(enrollment.getKey()));
+        assertEquals(EnrollmentStatus.RETRIEVED, tiqrService.enrollmentStatus(enrollment.getKey()).getStatus());
 
         when(enrollmentRepository.save(any(Enrollment.class))).thenAnswer(i -> i.getArguments()[0]);
         when(registrationRepository.save(any(Registration.class))).thenAnswer(i -> i.getArguments()[0]);
@@ -73,7 +73,7 @@ class TiqrServiceTest {
 
         when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey()))
                 .thenReturn(Optional.of(authentication));
-        assertEquals(AuthenticationStatus.PENDING, tiqrService.authenticationStatus(authentication.getSessionKey()));
+        assertEquals(AuthenticationStatus.PENDING, tiqrService.authenticationStatus(authentication.getSessionKey()).getStatus());
 
         when(registrationRepository.findRegistrationByUserId(authentication.getUserID()))
                 .thenReturn(Optional.of(registration));
@@ -87,7 +87,7 @@ class TiqrServiceTest {
                 "01234567890"
         );
         tiqrService.postAuthentication(authenticationData);
-        assertEquals(AuthenticationStatus.SUCCESS, tiqrService.authenticationStatus(authentication.getSessionKey()));
+        assertEquals(AuthenticationStatus.SUCCESS, tiqrService.authenticationStatus(authentication.getSessionKey()).getStatus());
     }
 
     @Test

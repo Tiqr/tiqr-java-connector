@@ -32,7 +32,7 @@ class NotificationGatewayTest {
     private static NotificationGateway notificationGateway;
 
     @BeforeAll
-    static void beforeAll() throws IOException, ExecutionException, InterruptedException, NoSuchAlgorithmException, InvalidKeyException {
+    static void beforeAll() throws Exception {
         notificationGateway = new NotificationGateway(
                 "localhost",
                 8099,
@@ -45,7 +45,7 @@ class NotificationGatewayTest {
     }
 
     @BeforeEach
-    void beforeEach() throws IOException, ExecutionException, InterruptedException, NoSuchAlgorithmException, InvalidKeyException {
+    void beforeEach() throws Exception {
         server = buildServer(new AcceptAllPushNotificationHandlerFactory(), null);
         server.start(8099).get();
     }

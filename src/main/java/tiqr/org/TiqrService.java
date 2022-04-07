@@ -73,8 +73,8 @@ public class TiqrService {
         return registrationRepository.save(registration);
     }
 
-    public EnrollmentStatus enrollmentStatus(String enrollmentKey) {
-        return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new).getStatus();
+    public Enrollment enrollmentStatus(String enrollmentKey) {
+        return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
     }
 
     public Authentication startAuthentication(String userId, String userDisplayName) {
@@ -108,8 +108,8 @@ public class TiqrService {
         authenticationRepository.save(authentication);
     }
 
-    public AuthenticationStatus authenticationStatus(String sessionKey) {
-        return authenticationRepository.findAuthenticationBySessionKey(sessionKey).orElseThrow(IllegalArgumentException::new).getStatus();
+    public Authentication authenticationStatus(String sessionKey) {
+        return authenticationRepository.findAuthenticationBySessionKey(sessionKey).orElseThrow(IllegalArgumentException::new);
     }
 
 
