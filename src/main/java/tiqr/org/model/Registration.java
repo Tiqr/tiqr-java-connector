@@ -16,48 +16,25 @@ public class Registration {
     @Id
     private String id;
 
-    private String userid;
+    private String userId;
     private String secret;
     private String enrollmentSecret;
     private String language;
     private String notificationType;
     private String notificationAddress;
-    private String version;
     private String operation;
     private Instant created;
     private Instant updated;
 
-    public Registration() {
-        this(null, null);
-    }
-
-    public Registration(String userid, String notificationAddress) {
-        this(userid, null, null, null, null, notificationAddress, null, null);
-    }
-
-    public Registration(String userid,
-                        String sharedSecret,
-                        String enrollmentSecret,
-                        String language,
-                        String notificationType,
-                        String notificationAddress,
-                        String version,
-                        String operation) {
-        this.userid = userid;
-        this.secret = sharedSecret;
-        this.enrollmentSecret = enrollmentSecret;
-        this.language = language;
-        this.notificationType = notificationType;
-        this.notificationAddress = notificationAddress;
-        this.version = version;
-        this.operation = operation;
-        this.created = Instant.now();
-        this.updated = Instant.now();
-    }
-
     public void validateForInitialEnrollment() {
-        Assert.hasLength(userid, "userid is empty");
+        validateForPushNotification();
         Assert.hasLength(enrollmentSecret, "enrollmentSecret is empty");
+    }
+
+    public void validateForPushNotification() {
+        Assert.hasLength(userId, "userId is empty");
+        Assert.hasLength(notificationType, "notificationType is empty");
         Assert.hasLength(notificationAddress, "notificationAddress is empty");
+        NotificationType.valueOf(notificationType);
     }
 }

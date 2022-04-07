@@ -1,6 +1,7 @@
 package tiqr.org.push;
 
 import org.springframework.core.io.Resource;
+import tiqr.org.model.NotificationType;
 import tiqr.org.model.Registration;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class NotificationGateway implements PushNotifier {
 
     @Override
     public String push(Registration registration) throws PushNotificationException {
-        return registration.getNotificationType().equals("APNS") ? apns.push(registration) : gcm.push(registration);
+        registration.validateForPushNotification();
+        return registration.getNotificationType().equals(NotificationType.APNS.name()) ? apns.push(registration) : gcm.push(registration);
     }
 }

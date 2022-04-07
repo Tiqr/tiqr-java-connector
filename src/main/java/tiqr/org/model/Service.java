@@ -19,6 +19,7 @@ public class Service {
     private String logoUrl;
     private String infoUrl;
     private String authenticationUrl;
+    private boolean pushNotificationsEnabled;
     private String enrollmentUrl;
 
     public static Service addEnrollmentSecret(Service baseService, String enrollmentSecret) {
@@ -28,6 +29,7 @@ public class Service {
                 baseService.getLogoUrl(),
                 baseService.getInfoUrl(),
                 baseService.getAuthenticationUrl(),
+                baseService.isPushNotificationsEnabled(),
                 UriComponentsBuilder
                         .fromHttpUrl(baseService.enrollmentUrl)
                         .queryParam("enrollment_secret", enrollmentSecret)

@@ -26,7 +26,10 @@ class APNSTest {
                 new ClassPathResource("token-auth-private-key.p8"),
                 Optional.of(new ClassPathResource("/ca.pem")),
                 "teamId", "keyId");
-        String uuid = apns.push(new Registration("userId", "123456789"));
+        Registration registration = new Registration();
+        registration.setUserId("userId");
+        registration.setNotificationAddress("123456789");
+        String uuid = apns.push(registration);
         assertNotNull(uuid);
     }
 

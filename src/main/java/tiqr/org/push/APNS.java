@@ -44,7 +44,7 @@ public class APNS implements PushNotifier {
 
     public String push(Registration registration) {
         String notificationAddress = registration.getNotificationAddress();
-        String userId = registration.getUserid();
+        String userId = registration.getUserId();
 
         ApnsPayloadBuilder payloadBuilder = new SimpleApnsPayloadBuilder();
         payloadBuilder.setCategoryName("tiqr");
@@ -54,16 +54,14 @@ public class APNS implements PushNotifier {
 
         try {
             PushNotificationResponse<SimpleApnsPushNotification> response = this.apnsClient.sendNotification(pushNotification).get();
-            if (response == null || !response.isAccepted()) {
-                throw new PushNotificationException(String.format(
-                        "Error in push notification APNS for user % and token %s", userId, notificationAddress
-                ));
-            }
+            String id = response.getApnsId().toString();
+
             LOG.info(String.format("Push notification APNS send for user %s and token %s", userId, notificationAddress));
-            return response.getApnsId().toString();
-        } catch (InterruptedException | ExecutionException e) {
+
+            return id;
+        } catch (InterruptedException | ExecutionException | NullPointerException e) {
             throw new PushNotificationException(String.format(
-                    "Error in push notification APNS for user % and token %s", userId, notificationAddress
+                    "Error in push notification APNS for user %s and token %s", userId, notificationAddress
             ), e);
         }
     }

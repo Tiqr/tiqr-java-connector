@@ -36,6 +36,7 @@ class TiqrServiceTest {
                     "http://localhost/logo",
                     "http://localhost/info",
                     "http://localhost/authention",
+                    true,
                     "http://localhost/enroll"
             ), "secret");
 
@@ -98,6 +99,16 @@ class TiqrServiceTest {
     }
 
     @Test
+    void ensureUserIdEquals() {
+        Registration registration = new Registration();
+        registration.setEnrollmentSecret("secret");
+        Enrollment enrollment = new Enrollment("key", "user-id", "display-name", EnrollmentStatus.RETRIEVED);
+        when(enrollmentRepository.findEnrollmentByEnrollmentSecret(registration.getEnrollmentSecret())).thenReturn(Optional.of(enrollment));
+
+        assertThrows(IllegalArgumentException.class, () -> tiqrService.enrollData(registration));
+    }
+
+    @Test
     void ensureRetrievedStatus() {
         Enrollment enrollment = new Enrollment("key", "user-id", "display-name", EnrollmentStatus.PROCESSED);
         when(enrollmentRepository.findEnrollmentByEnrollmentSecret(enrollment.getEnrollmentSecret())).thenReturn(Optional.of(enrollment));
@@ -127,7 +138,15 @@ class TiqrServiceTest {
     }
 
     private Registration getRegistration(String enrollmentSecret) {
-        return new Registration("user-id", sharedSecret, enrollmentSecret, "nl", "APNS", "123456", "2", "register");
+        Registration registration = new Registration();
+        registration.setUserId("user-id");
+        registration.setSecret(sharedSecret);
+        registration.setEnrollmentSecret(enrollmentSecret);
+        registration.setLanguage("en");
+        registration.setNotificationType("APNS");
+        registration.setNotificationAddress("1234567890");
+        registration.setOperation("register");
+        return registration;
     }
 
 

@@ -33,7 +33,7 @@ public class GCM implements PushNotifier {
 
     public String push(Registration registration) {
         String notificationAddress = registration.getNotificationAddress();
-        String userId = registration.getUserid();
+        String userId = registration.getUserId();
 
         Notification notification = Notification.builder().setBody("tiqr-java-connector").build();
         Message message = Message
@@ -44,12 +44,12 @@ public class GCM implements PushNotifier {
         try {
             String uuid = firebaseMessaging.send(message);
 
-            LOG.info(String.format("Push notification GCM send for user % and token %s", userId, notificationAddress));
+            LOG.info(String.format("Push notification GCM send for user %s and token %s", userId, notificationAddress));
 
             return uuid;
         } catch (FirebaseMessagingException e) {
             throw new PushNotificationException(String.format(
-                    "Error in push notification GCM for user % and token %s", userId, notificationAddress
+                    "Error in push notification GCM for user %s and token %s", userId, notificationAddress
             ), e);
         }
 
