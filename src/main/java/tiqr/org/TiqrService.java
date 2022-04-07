@@ -77,14 +77,18 @@ public class TiqrService {
         return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
     }
 
-    public Authentication startAuthentication(String userId, String userDisplayName) {
+    public Authentication startAuthentication(String userId, String userDisplayName, boolean sendPushNotification) {
         Authentication authentication = new Authentication(
                 userId,
                 userDisplayName,
                 Challenge.generateSessionKey(),
                 Challenge.generateQH10Challenge(),
                 AuthenticationStatus.PENDING);
-        return authenticationRepository.save(authentication);
+        Authentication savedAuthentication = authenticationRepository.save(authentication);
+        if (sendPushNotification) {
+            //TODO
+        }
+        return savedAuthentication;
     }
 
     public void postAuthentication(AuthenticationData authenticationData) {
