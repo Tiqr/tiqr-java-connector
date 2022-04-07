@@ -99,7 +99,7 @@ class TiqrServiceTest {
     }
 
     @Test
-    void ensureUserIdEquals() {
+    void ensureRegistrationIsValid() {
         Registration registration = new Registration();
         registration.setEnrollmentSecret("secret");
         Enrollment enrollment = new Enrollment("key", "user-id", "display-name", EnrollmentStatus.RETRIEVED);

@@ -58,19 +58,18 @@ public class TiqrService {
             throw new IllegalArgumentException("Enrollment can only be called when the status is RETRIEVED. Current status is " + enrollment.getStatus());
         }
 
-        if (!enrollment.getUserID().equals(registration.getUserId())) {
-            throw new IllegalArgumentException(String.format("Enrollment has different userID (%s) then Registration (%s)",
-                    enrollment.getUserID(), registration.getUserId()));
+        registration.setUserId(enrollment.getUserID());
+        registration.setUserDisplayName(enrollment.getUserDisplayName());
 
-        }
         registration.validateForInitialEnrollment();
 
         enrollment.update(EnrollmentStatus.PROCESSED);
         enrollmentRepository.save(enrollment);
 
         registration.setSecret(secretCipher.encrypt(registration.getSecret()));
-        registration.setCreated(Instant.now());
-        registration.setUpdated(Instant.now());
+        Instant now = Instant.now();
+        registration.setCreated(now);
+        registration.setUpdated(now);
         return registrationRepository.save(registration);
     }
 

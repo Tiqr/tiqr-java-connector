@@ -17,6 +17,7 @@ public class Registration {
     private String id;
 
     private String userId;
+    private String userDisplayName;
     private String secret;
     private String enrollmentSecret;
     private String language;
