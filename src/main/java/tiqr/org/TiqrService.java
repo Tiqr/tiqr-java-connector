@@ -78,9 +78,10 @@ public class TiqrService {
         return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new).getStatus();
     }
 
-    public Authentication startAuthentication(String userId) {
+    public Authentication startAuthentication(String userId, String userDisplayName) {
         Authentication authentication = new Authentication(
                 userId,
+                userDisplayName,
                 Challenge.generateSessionKey(),
                 Challenge.generateQH10Challenge(),
                 AuthenticationStatus.PENDING);

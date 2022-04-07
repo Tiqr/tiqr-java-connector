@@ -69,7 +69,7 @@ class TiqrServiceTest {
         assertEquals(result.getSecret(), cipher.encrypt(sharedSecret));
 
         when(authenticationRepository.save(any(Authentication.class))).thenAnswer(i -> i.getArguments()[0]);
-        Authentication authentication = tiqrService.startAuthentication(userId);
+        Authentication authentication = tiqrService.startAuthentication(userId, "John Doe");
 
         when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey()))
                 .thenReturn(Optional.of(authentication));
@@ -121,6 +121,7 @@ class TiqrServiceTest {
     void ensurePendingStatus() {
         Authentication authentication = new Authentication(
                 "user-id",
+                "John Doe",
                 Challenge.generateSessionKey(),
                 Challenge.generateQH10Challenge(),
                 AuthenticationStatus.SUCCESS);

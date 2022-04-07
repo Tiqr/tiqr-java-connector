@@ -19,14 +19,16 @@ public class Authentication {
     private String id;
 
     private String userID;
+    private String userDisplayName;
     private String sessionKey;
     private String challenge;
     private AuthenticationStatus status;
     private Instant created;
     private Instant updated;
 
-    public Authentication(String userID, String sessionKey, String challenge, AuthenticationStatus status) {
+    public Authentication(String userID, String userDisplayName, String sessionKey, String challenge, AuthenticationStatus status) {
         this.userID = userID;
+        this.userDisplayName = userDisplayName;
         this.sessionKey = sessionKey;
         this.challenge = challenge;
         this.status = status;
