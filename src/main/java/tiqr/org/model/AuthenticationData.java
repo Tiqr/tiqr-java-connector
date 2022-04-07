@@ -12,7 +12,7 @@ import lombok.Setter;
 public class AuthenticationData {
 
     private String sessionKey;
-    private String userid;
+    private String userId;
     private String response;
     private String language;
     private String operation;
