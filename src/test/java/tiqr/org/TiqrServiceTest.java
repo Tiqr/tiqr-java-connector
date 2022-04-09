@@ -73,6 +73,7 @@ class TiqrServiceTest {
         assertThrows(IllegalArgumentException.class, () -> tiqrService.startAuthentication(userId, "John Doe", false));
 
         tiqrService.finishRegistration(userId);
+        assertEquals(RegistrationStatus.FINALIZED, registration.getStatus());
 
         when(authenticationRepository.save(any(Authentication.class))).thenAnswer(i -> i.getArguments()[0]);
         Authentication authentication = tiqrService.startAuthentication(userId, "John Doe", false);
