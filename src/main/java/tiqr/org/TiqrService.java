@@ -90,7 +90,7 @@ public class TiqrService {
     public Authentication startAuthentication(String userId, String userDisplayName, boolean sendPushNotification) {
         Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
 
-        if (!RegistrationStatus.FINALIZED.equals(registration.getStatus()) ) {
+        if (!RegistrationStatus.FINALIZED.equals(registration.getStatus())) {
             throw new IllegalArgumentException("Registration is not finished");
         }
 

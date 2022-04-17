@@ -6,12 +6,13 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.Assert;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 @Getter
 @Document(collection = "registrations")
 @Setter
-public class Registration {
+public class Registration implements Serializable {
 
     @Id
     private String id;
