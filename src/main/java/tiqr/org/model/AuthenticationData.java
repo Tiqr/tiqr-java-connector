@@ -19,4 +19,8 @@ public class AuthenticationData {
     private String notificationType;
     private String notificationAddress;
 
+    public AuthenticationData(String sessionKey, String response) {
+        this.sessionKey = sessionKey;
+        this.response = response;
+    }
 }

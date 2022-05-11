@@ -9,13 +9,11 @@ import com.eatthepath.pushy.apns.util.SimpleApnsPayloadBuilder;
 import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.core.io.Resource;
 import tiqr.org.model.Registration;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 public class APNS implements PushNotifier {
@@ -24,30 +22,26 @@ public class APNS implements PushNotifier {
 
     final ApnsClient apnsClient;
 
-    public APNS(String serverHost,
-                int port,
-                Resource signingKey,
-                Optional<Resource> serverCertificateChain,
-                String teamId,
-                String keyId) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+    public APNS(APNSConfiguration apnsConfiguration) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         ApnsClientBuilder apnsClientBuilder = new ApnsClientBuilder()
-                .setApnsServer(serverHost, port)
-                .setSigningKey(ApnsSigningKey.loadFromInputStream(signingKey.getInputStream(),
-                        teamId, keyId));
+                .setApnsServer(apnsConfiguration.getServerHost(), apnsConfiguration.getPort())
+                .setSigningKey(ApnsSigningKey.loadFromInputStream(apnsConfiguration.getSigningKey().getInputStream(),
+                        apnsConfiguration.getTeamId(), apnsConfiguration.getKeyId()));
         //For integration testing
-        if (serverCertificateChain.isPresent()) {
+        if (apnsConfiguration.getServerCertificateChain().isPresent()) {
             apnsClientBuilder
-                    .setTrustedServerCertificateChain(serverCertificateChain.get().getInputStream());
+                    .setTrustedServerCertificateChain(apnsConfiguration.getServerCertificateChain().get().getInputStream());
         }
         this.apnsClient = apnsClientBuilder.build();
     }
 
-    public String push(Registration registration) {
+    public String push(Registration registration, String authorizationUrl) {
         String notificationAddress = registration.getNotificationAddress();
         String userId = registration.getUserId();
 
         ApnsPayloadBuilder payloadBuilder = new SimpleApnsPayloadBuilder();
-        payloadBuilder.setCategoryName("tiqr");
+        payloadBuilder.setAlertBody("Please log in");
+        payloadBuilder.addCustomProperty("challenge", authorizationUrl);
 
         String payload = payloadBuilder.build();
         SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(notificationAddress, "tiqr", payload);

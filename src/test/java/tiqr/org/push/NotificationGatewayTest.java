@@ -15,10 +15,7 @@ import tiqr.org.WireMockExtension;
 import tiqr.org.model.Registration;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,13 +31,15 @@ class NotificationGatewayTest {
     @BeforeAll
     static void beforeAll() throws Exception {
         notificationGateway = new NotificationGateway(
-                "localhost",
-                8099,
-                new ClassPathResource("token-auth-private-key.p8"),
-                Optional.of(new ClassPathResource("/ca.pem")),
-                "teamId", "keyId",
-                new ClassPathResource("test-firebase-adminsdk.json"),
-                "tiqr-java-connector"
+                new APNSConfiguration(
+                        "localhost",
+                        8099,
+                        new ClassPathResource("token-auth-private-key.p8"),
+                        Optional.of(new ClassPathResource("/ca.pem")),
+                        "teamId", "keyId"),
+                new GCMConfiguration(
+                        new ClassPathResource("test-firebase-adminsdk.json"),
+                        "tiqr-java-connector")
         );
     }
 
@@ -58,7 +57,7 @@ class NotificationGatewayTest {
     @Test
     void pushAPNS() {
         Registration registration = getRegistration("APNS");
-        String uuid = notificationGateway.push(registration);
+        String uuid = notificationGateway.push(registration, "https://eduid.nl/tiqrauth");
         assertNotNull(uuid);
     }
 
@@ -66,7 +65,7 @@ class NotificationGatewayTest {
     void pushAPNSException() {
         server.shutdown();
         Registration registration = getRegistration("APNS");
-        assertThrows(PushNotificationException.class, () -> notificationGateway.push(registration));
+        assertThrows(PushNotificationException.class, () -> notificationGateway.push(registration, "https://eduid.nl/tiqrauth"));
     }
 
     @Test
@@ -84,13 +83,13 @@ class NotificationGatewayTest {
         stubFor(post(urlPathMatching("/message")).willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withBody(messageResponse)));
-        String uuid = notificationGateway.push(registration);
+        String uuid = notificationGateway.push(registration, "https://eduid.nl/tiqrauth");
         assertEquals("test", uuid);
 
         stubFor(post(urlPathMatching("/message")).willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(401)));
-        assertThrows(PushNotificationException.class, () -> notificationGateway.push(registration));
+        assertThrows(PushNotificationException.class, () -> notificationGateway.push(registration, "https://eduid.nl/tiqrauth"));
     }
 
     private Registration getRegistration(String notificationType) {

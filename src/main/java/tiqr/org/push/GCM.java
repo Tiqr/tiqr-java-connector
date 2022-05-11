@@ -6,13 +6,12 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.core.io.Resource;
 import tiqr.org.model.Registration;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class GCM implements PushNotifier {
 
@@ -20,26 +19,28 @@ public class GCM implements PushNotifier {
 
     private final FirebaseMessaging firebaseMessaging;
 
-    public GCM(Resource firebaseServiceAccount, String appName) throws IOException {
+    public GCM(GCMConfiguration gcmConfiguration) throws IOException {
         GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(firebaseServiceAccount.getInputStream());
+                .fromStream(gcmConfiguration.getFirebaseServiceAccoun().getInputStream());
         FirebaseOptions firebaseOptions = FirebaseOptions
                 .builder()
                 .setCredentials(googleCredentials)
                 .build();
-        FirebaseApp app = FirebaseApp.initializeApp(firebaseOptions, appName);
+        FirebaseApp app = FirebaseApp.initializeApp(firebaseOptions, gcmConfiguration.getAppName());
         this.firebaseMessaging = FirebaseMessaging.getInstance(app);
     }
 
-    public String push(Registration registration) {
+    public String push(Registration registration, String authorizationUrl) {
         String notificationAddress = registration.getNotificationAddress();
         String userId = registration.getUserId();
 
-        Notification notification = Notification.builder().setBody("tiqr-java-connector").build();
         Message message = Message
                 .builder()
                 .setToken(notificationAddress)
-                .setNotification(notification)
+                .putAllData(Map.of(
+                        "text", "Please log in",
+                        "challenge", authorizationUrl
+                ))
                 .build();
         try {
             String uuid = firebaseMessaging.send(message);

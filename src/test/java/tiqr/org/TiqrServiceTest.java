@@ -1,8 +1,11 @@
 package tiqr.org;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.util.UriComponentsBuilder;
 import tiqr.org.model.*;
+import tiqr.org.push.APNSConfiguration;
+import tiqr.org.push.GCMConfiguration;
 import tiqr.org.repo.AuthenticationRepository;
 import tiqr.org.repo.EnrollmentRepository;
 import tiqr.org.repo.RegistrationRepository;
@@ -11,6 +14,7 @@ import tiqr.org.secure.OCRA;
 import tiqr.org.secure.SecretCipher;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,7 +42,16 @@ class TiqrServiceTest {
                     "http://localhost/authention",
                     true,
                     "http://localhost/enroll"
-            ), "secret");
+            ), "secret",
+            new APNSConfiguration(
+                    "localhost",
+                    8099,
+                    new ClassPathResource("token-auth-private-key.p8"),
+                    Optional.of(new ClassPathResource("/ca.pem")),
+                    "teamId", "keyId"),
+            new GCMConfiguration(
+                    new ClassPathResource("test-firebase-adminsdk.json"),
+                    UUID.randomUUID().toString()));
 
     @Test
     void enrollmentScenario() {
@@ -70,13 +83,14 @@ class TiqrServiceTest {
 
         when(registrationRepository.findRegistrationByUserId(userId))
                 .thenReturn(Optional.of(registration));
-        assertThrows(IllegalArgumentException.class, () -> tiqrService.startAuthentication(userId, "John Doe", false));
+        assertThrows(IllegalArgumentException.class, () ->
+                tiqrService.startAuthentication(userId, "John Doe", "https://eduid.nl/tiqrauth", false));
 
         tiqrService.finishRegistration(userId);
         assertEquals(RegistrationStatus.FINALIZED, registration.getStatus());
 
         when(authenticationRepository.save(any(Authentication.class))).thenAnswer(i -> i.getArguments()[0]);
-        Authentication authentication = tiqrService.startAuthentication(userId, "John Doe", false);
+        Authentication authentication = tiqrService.startAuthentication(userId, "John Doe", "https://eduid.nl/tiqrauth", false);
 
         when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey()))
                 .thenReturn(Optional.of(authentication));
@@ -94,6 +108,13 @@ class TiqrServiceTest {
                 "01234567890"
         );
         tiqrService.postAuthentication(authenticationData);
+        assertEquals(AuthenticationStatus.SUCCESS, tiqrService.authenticationStatus(authentication.getSessionKey()).getStatus());
+
+        //Mimic the scenario where the user manually enters the TOTP code
+        authentication.setStatus(AuthenticationStatus.PENDING);
+        when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey()))
+                .thenReturn(Optional.of(authentication));
+        tiqrService.postAuthentication(new AuthenticationData(authenticationData.getSessionKey(), authenticationData.getResponse()));
         assertEquals(AuthenticationStatus.SUCCESS, tiqrService.authenticationStatus(authentication.getSessionKey()).getStatus());
     }
 

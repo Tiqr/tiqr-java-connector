@@ -20,16 +20,16 @@ class APNSTest {
     void push() throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException, ExecutionException {
         MockApnsServer server = buildServer(new AcceptAllPushNotificationHandlerFactory(), null);
         server.start(8099).get();
-        APNS apns = new APNS(
+        APNS apns = new APNS(new APNSConfiguration(
                 "localhost",
                 8099,
                 new ClassPathResource("token-auth-private-key.p8"),
                 Optional.of(new ClassPathResource("/ca.pem")),
-                "teamId", "keyId");
+                "teamId", "keyId"));
         Registration registration = new Registration();
         registration.setUserId("userId");
         registration.setNotificationAddress("123456789");
-        String uuid = apns.push(registration);
+        String uuid = apns.push(registration, "https://eduid.nl/tiqrauth");
         assertNotNull(uuid);
     }
 

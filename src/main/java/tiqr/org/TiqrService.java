@@ -1,6 +1,10 @@
 package tiqr.org;
 
+import org.springframework.util.StringUtils;
 import tiqr.org.model.*;
+import tiqr.org.push.APNSConfiguration;
+import tiqr.org.push.GCMConfiguration;
+import tiqr.org.push.NotificationGateway;
 import tiqr.org.repo.AuthenticationRepository;
 import tiqr.org.repo.EnrollmentRepository;
 import tiqr.org.repo.RegistrationRepository;
@@ -17,17 +21,21 @@ public class TiqrService {
 
     private final Service service;
     private final SecretCipher secretCipher;
+    private final NotificationGateway notificationGateway;
 
     public TiqrService(EnrollmentRepository enrollmentRepository,
                        RegistrationRepository registrationRepository,
                        AuthenticationRepository authenticationRepository,
                        Service service,
-                       String secret) {
+                       String secret,
+                       APNSConfiguration apnsConfiguration,
+                       GCMConfiguration gcmConfiguration) {
         this.enrollmentRepository = enrollmentRepository;
         this.registrationRepository = registrationRepository;
         this.authenticationRepository = authenticationRepository;
         this.service = service;
         this.secretCipher = new SecretCipher(secret);
+        this.notificationGateway = new NotificationGateway(apnsConfiguration, gcmConfiguration);
     }
 
     public Enrollment startEnrollment(String userID, String userDisplayName) {
@@ -87,7 +95,7 @@ public class TiqrService {
         return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
     }
 
-    public Authentication startAuthentication(String userId, String userDisplayName, boolean sendPushNotification) {
+    public Authentication startAuthentication(String userId, String userDisplayName, String authorizationUrl, boolean sendPushNotification) {
         Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
 
         if (!RegistrationStatus.FINALIZED.equals(registration.getStatus())) {
@@ -102,7 +110,7 @@ public class TiqrService {
                 AuthenticationStatus.PENDING);
         Authentication savedAuthentication = authenticationRepository.save(authentication);
         if (sendPushNotification) {
-            //TODO
+            notificationGateway.push(registration, authorizationUrl);
         }
         return savedAuthentication;
     }
@@ -119,10 +127,14 @@ public class TiqrService {
         String decryptedSecret = secretCipher.decrypt(registration.getSecret());
         Challenge.verifyOcra(decryptedSecret, authentication.getChallenge(), authentication.getSessionKey(), authenticationData.getResponse());
 
-        registration.setNotificationAddress(authenticationData.getNotificationAddress());
-        registration.setUpdated(Instant.now());
 
-        registrationRepository.save(registration);
+        String notificationAddress = authenticationData.getNotificationAddress();
+        if (StringUtils.hasText(notificationAddress)) {
+            registration.setNotificationAddress(notificationAddress);
+            registration.setUpdated(Instant.now());
+
+            registrationRepository.save(registration);
+        }
 
         authentication.update(AuthenticationStatus.SUCCESS);
         authenticationRepository.save(authentication);

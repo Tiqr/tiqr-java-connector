@@ -4,6 +4,6 @@ import tiqr.org.model.Registration;
 
 public interface PushNotifier {
 
-    String push(Registration registration) throws PushNotificationException;
+    String push(Registration registration, String authorizationUrl) throws PushNotificationException;
 
 }
