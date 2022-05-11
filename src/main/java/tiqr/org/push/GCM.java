@@ -21,7 +21,7 @@ public class GCM implements PushNotifier {
 
     public GCM(GCMConfiguration gcmConfiguration) throws IOException {
         GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(gcmConfiguration.getFirebaseServiceAccoun().getInputStream());
+                .fromStream(gcmConfiguration.getFirebaseServiceAccount().getInputStream());
         FirebaseOptions firebaseOptions = FirebaseOptions
                 .builder()
                 .setCredentials(googleCredentials)

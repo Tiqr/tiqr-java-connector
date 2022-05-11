@@ -8,6 +8,6 @@ import org.springframework.core.io.Resource;
 @Getter
 public class GCMConfiguration {
 
-    private Resource firebaseServiceAccoun;
+    private Resource firebaseServiceAccount;
     private String appName;
 }
