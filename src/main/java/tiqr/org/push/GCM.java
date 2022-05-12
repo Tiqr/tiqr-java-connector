@@ -8,6 +8,9 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import tiqr.org.model.Registration;
 
 import java.io.IOException;
@@ -20,8 +23,11 @@ public class GCM implements PushNotifier {
     private final FirebaseMessaging firebaseMessaging;
 
     public GCM(GCMConfiguration gcmConfiguration) throws IOException {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+
+        Resource firebaseServiceAccountResource = resourceLoader.getResource(gcmConfiguration.getFirebaseServiceAccount());
         GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(gcmConfiguration.getFirebaseServiceAccount().getInputStream());
+                .fromStream(firebaseServiceAccountResource.getInputStream());
         FirebaseOptions firebaseOptions = FirebaseOptions
                 .builder()
                 .setCredentials(googleCredentials)

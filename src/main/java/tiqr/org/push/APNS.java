@@ -9,6 +9,10 @@ import com.eatthepath.pushy.apns.util.SimpleApnsPayloadBuilder;
 import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.StringUtils;
 import tiqr.org.model.Registration;
 
 import java.io.IOException;
@@ -24,14 +28,17 @@ public class APNS implements PushNotifier {
     private final String topic;
 
     public APNS(APNSConfiguration apnsConfiguration) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource signingKeyResource = resourceLoader.getResource(apnsConfiguration.getSigningKey());
         ApnsClientBuilder apnsClientBuilder = new ApnsClientBuilder()
                 .setApnsServer(apnsConfiguration.getServerHost(), apnsConfiguration.getPort())
-                .setSigningKey(ApnsSigningKey.loadFromInputStream(apnsConfiguration.getSigningKey().getInputStream(),
+                .setSigningKey(ApnsSigningKey.loadFromInputStream(signingKeyResource.getInputStream(),
                         apnsConfiguration.getTeamId(), apnsConfiguration.getKeyId()));
         //For integration testing
-        if (apnsConfiguration.getServerCertificateChain().isPresent()) {
+        if (StringUtils.hasText(apnsConfiguration.getServerCertificateChain())) {
+            Resource serverCertificateChainResource = resourceLoader.getResource(apnsConfiguration.getServerCertificateChain());
             apnsClientBuilder
-                    .setTrustedServerCertificateChain(apnsConfiguration.getServerCertificateChain().get().getInputStream());
+                    .setTrustedServerCertificateChain(serverCertificateChainResource.getInputStream());
         }
         this.apnsClient = apnsClientBuilder.build();
         this.topic = apnsConfiguration.getTopic();

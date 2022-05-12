@@ -15,7 +15,6 @@ import tiqr.org.WireMockExtension;
 import tiqr.org.model.Registration;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -35,13 +34,13 @@ class NotificationGatewayTest {
                 new APNSConfiguration(
                         "localhost",
                         8099,
-                        new ClassPathResource("token-auth-private-key.p8"),
-                        Optional.of(new ClassPathResource("/ca.pem")),
+                        "classpath:token-auth-private-key.p8",
+                        "classpath:/ca.pem",
                         "topic",
                         "teamId",
                         "keyId"),
                 new GCMConfiguration(
-                        new ClassPathResource("test-firebase-adminsdk.json"),
+                        "classpath:/test-firebase-adminsdk.json",
                         "tiqr-java-connector")
         );
     }

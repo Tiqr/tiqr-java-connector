@@ -9,7 +9,6 @@ import tiqr.org.model.Registration;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -23,8 +22,8 @@ class APNSTest {
         APNS apns = new APNS(new APNSConfiguration(
                 "localhost",
                 8099,
-                new ClassPathResource("token-auth-private-key.p8"),
-                Optional.of(new ClassPathResource("/ca.pem")),
+                "classpath:/token-auth-private-key.p8",
+                "classpath:/ca.pem",
                 "topic",
                 "teamId",
                 "keyId"));

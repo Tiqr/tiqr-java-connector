@@ -1,7 +1,6 @@
 package tiqr.org;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.util.UriComponentsBuilder;
 import tiqr.org.model.*;
 import tiqr.org.push.APNSConfiguration;
@@ -47,12 +46,13 @@ class TiqrServiceTest {
             new APNSConfiguration(
                     "localhost",
                     8099,
-                    new ClassPathResource("token-auth-private-key.p8"),
-                    Optional.of(new ClassPathResource("/ca.pem")),
+                    "classpath:/token-auth-private-key.p8",
+                    "classpath:/ca.pem",
                     "topic",
-                    "teamId", "keyId"),
+                    "teamId",
+                    "keyId"),
             new GCMConfiguration(
-                    new ClassPathResource("test-firebase-adminsdk.json"),
+                    "classpath:/test-firebase-adminsdk.json",
                     UUID.randomUUID().toString()));
 
     @Test
