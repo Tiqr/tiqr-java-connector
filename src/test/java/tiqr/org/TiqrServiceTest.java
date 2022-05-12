@@ -49,6 +49,7 @@ class TiqrServiceTest {
                     8099,
                     new ClassPathResource("token-auth-private-key.p8"),
                     Optional.of(new ClassPathResource("/ca.pem")),
+                    "topic",
                     "teamId", "keyId"),
             new GCMConfiguration(
                     new ClassPathResource("test-firebase-adminsdk.json"),

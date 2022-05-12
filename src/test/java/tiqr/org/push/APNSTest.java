@@ -25,12 +25,15 @@ class APNSTest {
                 8099,
                 new ClassPathResource("token-auth-private-key.p8"),
                 Optional.of(new ClassPathResource("/ca.pem")),
-                "teamId", "keyId"));
+                "topic",
+                "teamId",
+                "keyId"));
         Registration registration = new Registration();
         registration.setUserId("userId");
         registration.setNotificationAddress("123456789");
         String uuid = apns.push(registration, "https://eduid.nl/tiqrauth");
         assertNotNull(uuid);
+        server.shutdown().get();
     }
 
     protected MockApnsServer buildServer(final PushNotificationHandlerFactory handlerFactory, final MockApnsServerListener listener) throws IOException {

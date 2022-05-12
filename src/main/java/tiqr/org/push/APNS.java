@@ -20,7 +20,8 @@ public class APNS implements PushNotifier {
 
     private static final Log LOG = LogFactory.getLog(APNS.class);
 
-    final ApnsClient apnsClient;
+    private final ApnsClient apnsClient;
+    private final String topic;
 
     public APNS(APNSConfiguration apnsConfiguration) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         ApnsClientBuilder apnsClientBuilder = new ApnsClientBuilder()
@@ -33,6 +34,7 @@ public class APNS implements PushNotifier {
                     .setTrustedServerCertificateChain(apnsConfiguration.getServerCertificateChain().get().getInputStream());
         }
         this.apnsClient = apnsClientBuilder.build();
+        this.topic = apnsConfiguration.getTopic();
     }
 
     public String push(Registration registration, String authorizationUrl) {
@@ -44,7 +46,7 @@ public class APNS implements PushNotifier {
         payloadBuilder.addCustomProperty("challenge", authorizationUrl);
 
         String payload = payloadBuilder.build();
-        SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(notificationAddress, "tiqr", payload);
+        SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(notificationAddress, this.topic, payload);
 
         try {
             PushNotificationResponse<SimpleApnsPushNotification> response = this.apnsClient.sendNotification(pushNotification).get();

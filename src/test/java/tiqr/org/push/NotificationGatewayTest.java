@@ -30,14 +30,16 @@ class NotificationGatewayTest {
     private static NotificationGateway notificationGateway;
 
     @BeforeAll
-    static void beforeAll() throws Exception {
+    static void beforeAll() {
         notificationGateway = new NotificationGateway(
                 new APNSConfiguration(
                         "localhost",
                         8099,
                         new ClassPathResource("token-auth-private-key.p8"),
                         Optional.of(new ClassPathResource("/ca.pem")),
-                        "teamId", "keyId"),
+                        "topic",
+                        "teamId",
+                        "keyId"),
                 new GCMConfiguration(
                         new ClassPathResource("test-firebase-adminsdk.json"),
                         "tiqr-java-connector")

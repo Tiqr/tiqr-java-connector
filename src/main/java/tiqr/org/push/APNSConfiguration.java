@@ -16,6 +16,7 @@ public class APNSConfiguration {
     private int port;
     private Resource signingKey;
     private Optional<Resource> serverCertificateChain;
+    private String topic;
     private String teamId;
     private String keyId;
 
