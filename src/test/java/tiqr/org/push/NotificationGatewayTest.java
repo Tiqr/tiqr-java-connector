@@ -16,6 +16,7 @@ import tiqr.org.model.Registration;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,8 +51,8 @@ class NotificationGatewayTest {
     }
 
     @AfterEach
-    void afterEach() {
-        server.shutdown();
+    void afterEach() throws ExecutionException, InterruptedException {
+        server.shutdown().get();
     }
 
     @Test
