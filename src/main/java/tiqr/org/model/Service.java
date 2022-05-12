@@ -16,6 +16,7 @@ public class Service {
 
     private String displayName;
     private String identifier;
+    private String version;
     private String logoUrl;
     private String infoUrl;
     private String authenticationUrl;
@@ -26,6 +27,7 @@ public class Service {
         return new Service(
                 baseService.getDisplayName(),
                 baseService.getIdentifier(),
+                baseService.getVersion(),
                 baseService.getLogoUrl(),
                 baseService.getInfoUrl(),
                 baseService.getAuthenticationUrl(),

@@ -11,6 +11,8 @@ import tiqr.org.repo.RegistrationRepository;
 import tiqr.org.secure.Challenge;
 import tiqr.org.secure.SecretCipher;
 
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.time.Instant;
 
 public class TiqrService {
@@ -95,22 +97,33 @@ public class TiqrService {
         return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
     }
 
-    public Authentication startAuthentication(String userId, String userDisplayName, String authorizationUrl, boolean sendPushNotification) {
+    public Authentication startAuthentication(String userId, String userDisplayName, String eduIdAppBaseUrl, boolean sendPushNotification) {
         Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
 
         if (!RegistrationStatus.FINALIZED.equals(registration.getStatus())) {
             throw new IllegalArgumentException("Registration is not finished");
         }
+        String sessionKey = Challenge.generateSessionKey();
+        String challenge = Challenge.generateQH10Challenge();
+        String authenticationUrl = String.format("https://%s/tiqrauth?u=%s&s=%s&q=%s&i=%s&v=%s",
+                eduIdAppBaseUrl,
+                encode(userId),
+                encode(sessionKey),
+                encode(challenge),
+                encode(this.service.getIdentifier()),
+                encode(this.service.getVersion()));
 
         Authentication authentication = new Authentication(
                 userId,
                 userDisplayName,
-                Challenge.generateSessionKey(),
-                Challenge.generateQH10Challenge(),
+                sessionKey,
+                challenge,
+                authenticationUrl,
                 AuthenticationStatus.PENDING);
+
         Authentication savedAuthentication = authenticationRepository.save(authentication);
         if (sendPushNotification) {
-            notificationGateway.push(registration, authorizationUrl);
+            notificationGateway.push(registration, authenticationUrl);
         }
         return savedAuthentication;
     }
@@ -144,5 +157,8 @@ public class TiqrService {
         return authenticationRepository.findAuthenticationBySessionKey(sessionKey).orElseThrow(IllegalArgumentException::new);
     }
 
+    private String encode(String s) {
+        return URLEncoder.encode(s, Charset.defaultCharset());
+    }
 
 }

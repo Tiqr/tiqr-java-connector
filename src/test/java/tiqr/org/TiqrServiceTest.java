@@ -37,6 +37,7 @@ class TiqrServiceTest {
             new Service(
                     "test",
                     "test",
+                    "1.0",
                     "http://localhost/logo",
                     "http://localhost/info",
                     "http://localhost/authention",
@@ -152,6 +153,7 @@ class TiqrServiceTest {
                 "John Doe",
                 Challenge.generateSessionKey(),
                 Challenge.generateQH10Challenge(),
+                "https://eduid.nl/tiqrauth",
                 AuthenticationStatus.SUCCESS);
         when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey())).thenReturn(Optional.of(authentication));
 

@@ -23,14 +23,16 @@ public class Authentication implements Serializable {
     private String sessionKey;
     private String challenge;
     private AuthenticationStatus status;
+    private String authenticationUrl;
     private Instant created;
     private Instant updated;
 
-    public Authentication(String userID, String userDisplayName, String sessionKey, String challenge, AuthenticationStatus status) {
+    public Authentication(String userID, String userDisplayName, String sessionKey, String challenge, String authenticationUrl, AuthenticationStatus status) {
         this.userID = userID;
         this.userDisplayName = userDisplayName;
         this.sessionKey = sessionKey;
         this.challenge = challenge;
+        this.authenticationUrl = authenticationUrl;
         this.status = status;
         this.created = Instant.now();
         this.updated = Instant.now();
