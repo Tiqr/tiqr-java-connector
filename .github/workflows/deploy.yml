@@ -16,16 +16,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+        cache: 'maven'
         server-id: openconext-releases
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
-    - name: Set up cache
-      uses: actions/cache@v1
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
     - name: Deploy with Maven
       run: mvn --batch-mode deploy -DskipTests
       env:
