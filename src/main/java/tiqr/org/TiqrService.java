@@ -14,6 +14,7 @@ import tiqr.org.secure.SecretCipher;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.time.Instant;
+import java.util.Optional;
 
 public class TiqrService {
 
@@ -41,6 +42,11 @@ public class TiqrService {
     }
 
     public Enrollment startEnrollment(String userID, String userDisplayName) {
+        Optional<Registration> registration = registrationRepository.findRegistrationByUserId(userID);
+        if (registration.isPresent() && registration.get().getStatus().equals(RegistrationStatus.FINALIZED)) {
+            throw new IllegalArgumentException(
+                    String.format("Not allowed to startEnrollment for %s when there is a finalized registration", userDisplayName));
+        }
         Enrollment enrollment = new Enrollment(Challenge.generateNonce(), userID, userDisplayName, EnrollmentStatus.INITIALIZED);
         return enrollmentRepository.save(enrollment);
     }
