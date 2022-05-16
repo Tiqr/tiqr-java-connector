@@ -113,7 +113,7 @@ public class DefaultTiqrService implements TiqrService {
         Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
 
         if (!RegistrationStatus.FINALIZED.equals(registration.getStatus())) {
-            throw new IllegalArgumentException("Registration is not finished");
+            throw new IllegalArgumentException("Registration is not FINALIZED, but "+ registration.getStatus());
         }
         String sessionKey = Challenge.generateSessionKey();
         String challenge = Challenge.generateQH10Challenge();
