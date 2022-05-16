@@ -29,7 +29,7 @@ class TiqrServiceTest {
 
     private final String sharedSecret = Challenge.generateNonce();
 
-    private final TiqrService tiqrService = new TiqrService(
+    private final DefaultTiqrService tiqrService = new DefaultTiqrService(
             enrollmentRepository,
             registrationRepository,
             authenticationRepository,

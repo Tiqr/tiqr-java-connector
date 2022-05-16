@@ -1,169 +1,65 @@
 package tiqr.org;
 
-import org.springframework.util.StringUtils;
 import tiqr.org.model.*;
-import tiqr.org.push.APNSConfiguration;
-import tiqr.org.push.GCMConfiguration;
-import tiqr.org.push.NotificationGateway;
-import tiqr.org.repo.AuthenticationRepository;
-import tiqr.org.repo.EnrollmentRepository;
-import tiqr.org.repo.RegistrationRepository;
-import tiqr.org.secure.Challenge;
-import tiqr.org.secure.SecretCipher;
 
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.time.Instant;
-import java.util.Optional;
+public interface TiqrService {
+    /**
+     * Start an enrollment. The enrollment will be persisted in order to check the status.
+     *
+     * @param userID the unique identifier of the User
+     * @param userDisplayName displayName of the User
+     * @return new Enrollment
+     */
+    Enrollment startEnrollment(String userID, String userDisplayName);
 
-public class TiqrService {
+    /**
+     * Retrieve the MetaData
+     * @param enrollmentKey the unique key of the enrollment
+     * @return the MetaData for the Tiqr app
+     */
+    MetaData getMetaData(String enrollmentKey);
 
-    private final EnrollmentRepository enrollmentRepository;
-    private final RegistrationRepository registrationRepository;
-    private final AuthenticationRepository authenticationRepository;
+    /**
+     * Finish the enrollment
+     * @param registration the form data from the Tiqr app
+     * @return The updated Registration
+     */
+    Registration enrollData(Registration registration);
 
-    private final Service service;
-    private final SecretCipher secretCipher;
-    private final NotificationGateway notificationGateway;
+    /**
+     * Finalize the registration after the User has provided a recovery method.
+     * @param userId the unique identifier of the User
+     * @return the finalized Registration
+     */
+    Registration finishRegistration(String userId);
 
-    public TiqrService(EnrollmentRepository enrollmentRepository,
-                       RegistrationRepository registrationRepository,
-                       AuthenticationRepository authenticationRepository,
-                       Service service,
-                       String secret,
-                       APNSConfiguration apnsConfiguration,
-                       GCMConfiguration gcmConfiguration) {
-        this.enrollmentRepository = enrollmentRepository;
-        this.registrationRepository = registrationRepository;
-        this.authenticationRepository = authenticationRepository;
-        this.service = service;
-        this.secretCipher = new SecretCipher(secret);
-        this.notificationGateway = new NotificationGateway(apnsConfiguration, gcmConfiguration);
-    }
+    /**
+     * Method to poll the status of the enrollment
+     * @param enrollmentKey the unique key of the enrollment
+     * @return the enrollment
+     */
+    Enrollment enrollmentStatus(String enrollmentKey);
 
-    public Enrollment startEnrollment(String userID, String userDisplayName) {
-        Optional<Registration> registration = registrationRepository.findRegistrationByUserId(userID);
-        if (registration.isPresent() && registration.get().getStatus().equals(RegistrationStatus.FINALIZED)) {
-            throw new IllegalArgumentException(
-                    String.format("Not allowed to startEnrollment for %s when there is a finalized registration", userDisplayName));
-        }
-        Enrollment enrollment = new Enrollment(Challenge.generateNonce(), userID, userDisplayName, EnrollmentStatus.INITIALIZED);
-        return enrollmentRepository.save(enrollment);
-    }
+    /**
+     * Start an authentication
+     * @param userId the unique identifier of the User
+     * @param userDisplayName displayName of the User
+     * @param eduIdAppBaseUrl the base URL of the eduID / Tiqr App
+     * @param sendPushNotification indicator if we send push notifications
+     * @return New Authentication
+     */
+    Authentication startAuthentication(String userId, String userDisplayName, String eduIdAppBaseUrl, boolean sendPushNotification);
 
-    public MetaData getMetaData(String enrollmentKey) {
-        Enrollment enrollment = enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
+    /**
+     * Finish an authentication
+     * @param authenticationData form data posted by the Tiqr app
+     */
+    void postAuthentication(AuthenticationData authenticationData);
 
-        if (!enrollment.getStatus().equals(EnrollmentStatus.INITIALIZED)) {
-            throw new IllegalArgumentException("Metadata can only be retrieved when the status is INITIALIZED. Current status is " + enrollment.getStatus());
-        }
-
-        String enrollmentSecret = Challenge.generateNonce();
-        enrollment.setEnrollmentSecret(enrollmentSecret);
-        enrollment.update(EnrollmentStatus.RETRIEVED);
-
-        enrollmentRepository.save(enrollment);
-        return new MetaData(Service.addEnrollmentSecret(this.service, enrollmentSecret), new Identity(enrollment));
-    }
-
-    public Registration enrollData(Registration registration) {
-        Enrollment enrollment = enrollmentRepository.findEnrollmentByEnrollmentSecret(registration.getEnrollmentSecret())
-                .orElseThrow(IllegalArgumentException::new);
-
-        if (!enrollment.getStatus().equals(EnrollmentStatus.RETRIEVED)) {
-            throw new IllegalArgumentException("Enrollment can only be called when the status is RETRIEVED. Current status is " + enrollment.getStatus());
-        }
-
-        registration.setUserId(enrollment.getUserID());
-        registration.setUserDisplayName(enrollment.getUserDisplayName());
-        registration.setStatus(RegistrationStatus.INITIALIZED);
-
-        registration.validateForInitialEnrollment();
-
-        registration.setSecret(secretCipher.encrypt(registration.getSecret()));
-        Instant now = Instant.now();
-        registration.setCreated(now);
-        registration.setUpdated(now);
-
-        Registration savedRegistration = registrationRepository.save(registration);
-
-        enrollment.update(EnrollmentStatus.PROCESSED);
-        enrollmentRepository.save(enrollment);
-
-        return savedRegistration;
-    }
-
-    public Registration finishRegistration(String userId) {
-        Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
-        registration.setStatus(RegistrationStatus.FINALIZED);
-        return registrationRepository.save(registration);
-    }
-
-    public Enrollment enrollmentStatus(String enrollmentKey) {
-        return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
-    }
-
-    public Authentication startAuthentication(String userId, String userDisplayName, String eduIdAppBaseUrl, boolean sendPushNotification) {
-        Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
-
-        if (!RegistrationStatus.FINALIZED.equals(registration.getStatus())) {
-            throw new IllegalArgumentException("Registration is not finished");
-        }
-        String sessionKey = Challenge.generateSessionKey();
-        String challenge = Challenge.generateQH10Challenge();
-        String authenticationUrl = String.format("https://%s/tiqrauth?u=%s&s=%s&q=%s&i=%s&v=%s",
-                eduIdAppBaseUrl,
-                encode(userId),
-                encode(sessionKey),
-                encode(challenge),
-                encode(this.service.getIdentifier()),
-                encode(this.service.getVersion()));
-
-        Authentication authentication = new Authentication(
-                userId,
-                userDisplayName,
-                sessionKey,
-                challenge,
-                authenticationUrl,
-                AuthenticationStatus.PENDING);
-
-        Authentication savedAuthentication = authenticationRepository.save(authentication);
-        if (sendPushNotification) {
-            notificationGateway.push(registration, authenticationUrl);
-        }
-        return savedAuthentication;
-    }
-
-    public void postAuthentication(AuthenticationData authenticationData) {
-        Authentication authentication = authenticationRepository.findAuthenticationBySessionKey(authenticationData.getSessionKey())
-                .orElseThrow(IllegalArgumentException::new);
-
-        if (!authentication.getStatus().equals(AuthenticationStatus.PENDING)) {
-            throw new IllegalArgumentException("Authentication can only be called when the status is PENDING. Current status is " + authentication.getStatus());
-        }
-
-        Registration registration = registrationRepository.findRegistrationByUserId(authentication.getUserID()).orElseThrow(IllegalArgumentException::new);
-        String decryptedSecret = secretCipher.decrypt(registration.getSecret());
-        Challenge.verifyOcra(decryptedSecret, authentication.getChallenge(), authentication.getSessionKey(), authenticationData.getResponse());
-
-
-        String notificationAddress = authenticationData.getNotificationAddress();
-        if (StringUtils.hasText(notificationAddress)) {
-            registration.setNotificationAddress(notificationAddress);
-        }
-        registration.setUpdated(Instant.now());
-        registrationRepository.save(registration);
-
-        authentication.update(AuthenticationStatus.SUCCESS);
-        authenticationRepository.save(authentication);
-    }
-
-    public Authentication authenticationStatus(String sessionKey) {
-        return authenticationRepository.findAuthenticationBySessionKey(sessionKey).orElseThrow(IllegalArgumentException::new);
-    }
-
-    private String encode(String s) {
-        return URLEncoder.encode(s, Charset.defaultCharset());
-    }
-
+    /**
+     * Method to poll the status of the authentication
+     * @param sessionKey the unique key of the authentication
+     * @return the authentication
+     */
+    Authentication authenticationStatus(String sessionKey);
 }
