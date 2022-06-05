@@ -1,5 +1,7 @@
 package tiqr.org.model;
 
 public enum NotificationType {
-    APNS, GCM
+
+    APNS, APNS_DIRECT, FCM, GCM, FCM_DIRECT
+
 }

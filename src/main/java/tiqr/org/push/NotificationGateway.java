@@ -20,7 +20,16 @@ public class NotificationGateway implements PushNotifier {
     @Override
     public String push(Registration registration, String authorizationUrl) throws PushNotificationException {
         registration.validateForPushNotification();
-        return registration.getNotificationType().equals(NotificationType.APNS.name()) ?
-                apns.push(registration, authorizationUrl) : gcm.push(registration, authorizationUrl);
+        switch (NotificationType.valueOf(registration.getNotificationType())) {
+            case FCM:
+            case GCM:
+            case FCM_DIRECT:
+                return gcm.push(registration, authorizationUrl);
+            case APNS:
+            case APNS_DIRECT:
+                return apns.push(registration, authorizationUrl);
+            default:
+                throw new IllegalArgumentException("Unknown NotificationType" + registration.getNotificationType());
+        }
     }
 }
