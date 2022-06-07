@@ -14,7 +14,6 @@ import tiqr.org.secure.SecretCipher;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.time.Instant;
-import java.util.Optional;
 
 public class DefaultTiqrService implements TiqrService {
 
@@ -111,7 +110,7 @@ public class DefaultTiqrService implements TiqrService {
         Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
 
         if (!RegistrationStatus.FINALIZED.equals(registration.getStatus())) {
-            throw new IllegalArgumentException("Registration is not FINALIZED, but "+ registration.getStatus());
+            throw new IllegalArgumentException("Registration is not FINALIZED, but " + registration.getStatus());
         }
         String sessionKey = Challenge.generateSessionKey();
         String challenge = Challenge.generateQH10Challenge();
