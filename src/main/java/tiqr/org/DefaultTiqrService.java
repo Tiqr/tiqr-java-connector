@@ -114,7 +114,7 @@ public class DefaultTiqrService implements TiqrService {
         }
         String sessionKey = Challenge.generateSessionKey();
         String challenge = Challenge.generateQH10Challenge();
-        String authenticationUrl = String.format("https://%s/tiqrauth?u=%s&s=%s&q=%s&i=%s&v=%s",
+        String authenticationUrl = String.format("%s/tiqrauth?u=%s&s=%s&q=%s&i=%s&v=%s",
                 eduIdAppBaseUrl,
                 encode(userId),
                 encode(sessionKey),
