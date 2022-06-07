@@ -11,4 +11,7 @@ public interface EnrollmentRepository {
     Optional<Enrollment> findEnrollmentByKey(String key);
 
     Optional<Enrollment> findEnrollmentByEnrollmentSecret(String key);
+
+    Long deleteByUserID(String userID);
+
 }

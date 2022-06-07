@@ -9,4 +9,7 @@ public interface RegistrationRepository {
     Registration save(Registration registration);
 
     Optional<Registration> findRegistrationByUserId(String userId);
+
+    Long deleteByUserId(String userId);
+
 }

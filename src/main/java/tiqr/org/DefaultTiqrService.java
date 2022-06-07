@@ -43,11 +43,9 @@ public class DefaultTiqrService implements TiqrService {
 
     @Override
     public Enrollment startEnrollment(String userID, String userDisplayName) {
-        Optional<Registration> registration = registrationRepository.findRegistrationByUserId(userID);
-        if (registration.isPresent() && registration.get().getStatus().equals(RegistrationStatus.FINALIZED)) {
-            throw new IllegalArgumentException(
-                    String.format("Not allowed to startEnrollment for %s when there is a finalized registration", userDisplayName));
-        }
+        enrollmentRepository.deleteByUserID(userID);
+        registrationRepository.deleteByUserId(userID);
+
         Enrollment enrollment = new Enrollment(Challenge.generateNonce(), userID, userDisplayName, EnrollmentStatus.INITIALIZED);
         return enrollmentRepository.save(enrollment);
     }
