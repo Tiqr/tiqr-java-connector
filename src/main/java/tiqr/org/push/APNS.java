@@ -59,7 +59,7 @@ public class APNS implements PushNotifier {
             PushNotificationResponse<SimpleApnsPushNotification> response = this.apnsClient.sendNotification(pushNotification).get();
             String id = response.getApnsId().toString();
 
-            LOG.info(String.format("Push notification APNS send for user %s and token %s", userId, notificationAddress));
+            LOG.debug(String.format("Push notification APNS send for user %s and token %s", userId, notificationAddress));
 
             return id;
         } catch (InterruptedException | ExecutionException | NullPointerException e) {

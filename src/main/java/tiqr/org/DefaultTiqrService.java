@@ -1,5 +1,7 @@
 package tiqr.org;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 import tiqr.org.model.*;
 import tiqr.org.push.APNSConfiguration;
@@ -16,6 +18,8 @@ import java.nio.charset.Charset;
 import java.time.Instant;
 
 public class DefaultTiqrService implements TiqrService {
+
+    private static final Log LOG = LogFactory.getLog(DefaultTiqrService.class);
 
     private final EnrollmentRepository enrollmentRepository;
     private final RegistrationRepository registrationRepository;
@@ -45,6 +49,8 @@ public class DefaultTiqrService implements TiqrService {
         enrollmentRepository.deleteByUserID(userID);
         registrationRepository.deleteByUserId(userID);
 
+        LOG.debug("Starting enrollment for user " + userID);
+
         Enrollment enrollment = new Enrollment(Challenge.generateNonce(), userID, userDisplayName, EnrollmentStatus.INITIALIZED);
         return enrollmentRepository.save(enrollment);
     }
@@ -60,6 +66,8 @@ public class DefaultTiqrService implements TiqrService {
         String enrollmentSecret = Challenge.generateNonce();
         enrollment.setEnrollmentSecret(enrollmentSecret);
         enrollment.update(EnrollmentStatus.RETRIEVED);
+
+        LOG.debug("Get metadata for enrollment for user " + enrollment.getUserID());
 
         enrollmentRepository.save(enrollment);
         return new MetaData(Service.addEnrollmentSecret(this.service, enrollmentSecret), new Identity(enrollment));
@@ -90,6 +98,8 @@ public class DefaultTiqrService implements TiqrService {
         enrollment.update(EnrollmentStatus.PROCESSED);
         enrollmentRepository.save(enrollment);
 
+        LOG.debug("Preliminary registration for " + enrollment.getUserID());
+
         return savedRegistration;
     }
 
@@ -97,6 +107,9 @@ public class DefaultTiqrService implements TiqrService {
     public Registration finishRegistration(String userId) {
         Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
         registration.setStatus(RegistrationStatus.FINALIZED);
+
+        LOG.debug("Finished registration for " + userId);
+
         return registrationRepository.save(registration);
     }
 
@@ -134,6 +147,9 @@ public class DefaultTiqrService implements TiqrService {
         if (sendPushNotification) {
             notificationGateway.push(registration, authenticationUrl);
         }
+
+        LOG.debug("Started authentication for " + userId);
+
         return savedAuthentication;
     }
 
@@ -160,6 +176,8 @@ public class DefaultTiqrService implements TiqrService {
 
         authentication.update(AuthenticationStatus.SUCCESS);
         authenticationRepository.save(authentication);
+
+        LOG.debug("Finished authentication for " + authentication.getUserID());
     }
 
     @Override

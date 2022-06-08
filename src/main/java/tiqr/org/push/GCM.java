@@ -51,7 +51,7 @@ public class GCM implements PushNotifier {
         try {
             String uuid = firebaseMessaging.send(message);
 
-            LOG.info(String.format("Push notification GCM send for user %s and token %s", userId, notificationAddress));
+            LOG.debug(String.format("Push notification GCM send for user %s and token %s", userId, notificationAddress));
 
             return uuid;
         } catch (FirebaseMessagingException e) {
