@@ -24,6 +24,7 @@ public class Authentication implements Serializable {
     private String challenge;
     private AuthenticationStatus status;
     private String authenticationUrl;
+    private boolean pushNotificationSend;
     private Instant created;
     private Instant updated;
 
