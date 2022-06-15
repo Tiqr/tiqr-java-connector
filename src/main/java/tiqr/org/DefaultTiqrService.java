@@ -143,22 +143,20 @@ public class DefaultTiqrService implements TiqrService {
                 authenticationUrl,
                 AuthenticationStatus.PENDING);
 
-        Authentication savedAuthentication = authenticationRepository.save(authentication);
         if (sendPushNotification) {
             try {
                 notificationGateway.push(registration, authenticationUrl);
-                savedAuthentication.setPushNotificationSend(true);
+                authentication.setPushNotificationSend(true);
             } catch (RuntimeException e) {
                 LOG.error(String.format("Error in pushing notification for user %s and address %s",
                         registration.getUserId(),
                         registration.getNotificationAddress()), e);
             }
-
         }
 
         LOG.debug("Started authentication for " + userId);
 
-        return savedAuthentication;
+        return authenticationRepository.save(authentication);
     }
 
     @Override
