@@ -12,6 +12,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class SecretCipher {
 
+    private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
     private final SecretKeySpec secretKey;
 
     @SneakyThrows
@@ -23,14 +24,14 @@ public class SecretCipher {
 
     @SneakyThrows
     public String encrypt(String sharedSecret) {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         return Base64.getEncoder().encodeToString(cipher.doFinal(sharedSecret.getBytes(UTF_8)));
     }
 
     @SneakyThrows
     public String decrypt(String encodedEncryptedSecret) {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
         return new String(cipher.doFinal(Base64.getDecoder().decode(encodedEncryptedSecret)));
     }
