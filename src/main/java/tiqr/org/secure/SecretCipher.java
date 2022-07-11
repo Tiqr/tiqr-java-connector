@@ -23,14 +23,14 @@ public class SecretCipher {
 
     @SneakyThrows
     public String encrypt(String sharedSecret) {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         return Base64.getEncoder().encodeToString(cipher.doFinal(sharedSecret.getBytes(UTF_8)));
     }
 
     @SneakyThrows
     public String decrypt(String encodedEncryptedSecret) {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
         return new String(cipher.doFinal(Base64.getDecoder().decode(encodedEncryptedSecret)));
     }
