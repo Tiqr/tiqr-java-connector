@@ -9,3 +9,6 @@ jmeter.log
 results.log
 notes.txt
 dep.tree
+.classpath
+.project
+.settings/

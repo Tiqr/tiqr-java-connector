@@ -60,6 +60,10 @@ public class APNS implements PushNotifier {
             String id = response.getApnsId().toString();
 
             LOG.debug(String.format("Push notification APNS send for user %s and token %s", userId, notificationAddress));
+            
+            if (!response.isAccepted()) {
+            	LOG.warn(String.format("Message to user %s not accepted. Response: %s", userId, response.toString()));
+            }
 
             return id;
         } catch (InterruptedException | ExecutionException | NullPointerException e) {
