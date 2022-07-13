@@ -56,13 +56,13 @@ public class APNS implements PushNotifier {
         SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(notificationAddress, this.topic, payload);
 
         try {
+            LOG.debug(String.format("Sending push notification APNS for user %s and token %s", userId, notificationAddress));
+
             PushNotificationResponse<SimpleApnsPushNotification> response = this.apnsClient.sendNotification(pushNotification).get();
             String id = response.getApnsId().toString();
 
-            LOG.debug(String.format("Push notification APNS send for user %s and token %s", userId, notificationAddress));
-            
             if (!response.isAccepted()) {
-            	LOG.warn(String.format("Message to user %s not accepted. Response: %s", userId, response.toString()));
+            	LOG.warn(String.format("Message to user %s not accepted. Response: %s", userId, response));
             }
 
             return id;
