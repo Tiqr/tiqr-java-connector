@@ -57,7 +57,7 @@ class NotificationGatewayTest {
     }
 
     @Test
-    void pushAPNS() {
+    void pushAPNS() throws PushNotificationException {
         Registration registration = getRegistration("APNS");
         String uuid = notificationGateway.push(registration, "https://eduid.nl/tiqrauth");
         assertNotNull(uuid);
@@ -71,7 +71,7 @@ class NotificationGatewayTest {
     }
 
     @Test
-    void pushGCM() {
+    void pushGCM() throws PushNotificationException {
         Registration registration = getRegistration("GCM");
 
         tweakFCMSendUrl();

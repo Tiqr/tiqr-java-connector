@@ -1,6 +1,6 @@
 package tiqr.org.push;
 
-public class PushNotificationException extends RuntimeException {
+public class PushNotificationException extends Exception {
 
     public PushNotificationException(String message) {
         super(message);

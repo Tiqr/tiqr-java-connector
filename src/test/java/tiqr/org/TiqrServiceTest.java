@@ -56,7 +56,7 @@ class TiqrServiceTest {
                     UUID.randomUUID().toString()));
 
     @Test
-    void enrollmentScenario() {
+    void enrollmentScenario() throws TiqrException {
         when(enrollmentRepository.save(any(Enrollment.class))).thenAnswer(i -> i.getArguments()[0]);
         String userId = "user-id";
         Enrollment enrollment = tiqrService.startEnrollment(userId, "John Doe");
@@ -85,7 +85,7 @@ class TiqrServiceTest {
 
         when(registrationRepository.findRegistrationByUserId(userId))
                 .thenReturn(Optional.of(registration));
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(TiqrException.class, () ->
                 tiqrService.startAuthentication(userId, "John Doe", "https://eduid.nl/tiqrauth", false));
 
         tiqrService.finishRegistration(userId);
@@ -125,7 +125,7 @@ class TiqrServiceTest {
         Enrollment enrollment = new Enrollment("key", "user-id", "display-name", EnrollmentStatus.RETRIEVED);
         when(enrollmentRepository.findEnrollmentByKey(enrollment.getKey())).thenReturn(Optional.of(enrollment));
 
-        assertThrows(IllegalArgumentException.class, () -> tiqrService.getMetaData(enrollment.getKey()));
+        assertThrows(TiqrException.class, () -> tiqrService.getMetaData(enrollment.getKey()));
     }
 
     @Test
@@ -144,7 +144,7 @@ class TiqrServiceTest {
         when(enrollmentRepository.findEnrollmentByEnrollmentSecret(enrollment.getEnrollmentSecret())).thenReturn(Optional.of(enrollment));
 
         Registration registration = getRegistration(enrollment.getEnrollmentSecret());
-        assertThrows(IllegalArgumentException.class, () -> tiqrService.enrollData(registration));
+        assertThrows(TiqrException.class, () -> tiqrService.enrollData(registration));
     }
 
     @Test
@@ -158,7 +158,7 @@ class TiqrServiceTest {
                 AuthenticationStatus.SUCCESS);
         when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey())).thenReturn(Optional.of(authentication));
 
-        assertThrows(IllegalArgumentException.class, () -> tiqrService.postAuthentication(
+        assertThrows(TiqrException.class, () -> tiqrService.postAuthentication(
                 new AuthenticationData(
                         authentication.getSessionKey(),
                         "N/A",

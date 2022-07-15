@@ -36,7 +36,7 @@ public class GCM implements PushNotifier {
         this.firebaseMessaging = FirebaseMessaging.getInstance(app);
     }
 
-    public String push(Registration registration, String authorizationUrl) {
+    public String push(Registration registration, String authorizationUrl) throws PushNotificationException {
         String notificationAddress = registration.getNotificationAddress();
         String userId = registration.getUserId();
 

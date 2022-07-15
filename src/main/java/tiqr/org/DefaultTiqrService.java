@@ -7,6 +7,7 @@ import tiqr.org.model.*;
 import tiqr.org.push.APNSConfiguration;
 import tiqr.org.push.GCMConfiguration;
 import tiqr.org.push.NotificationGateway;
+import tiqr.org.push.PushNotificationException;
 import tiqr.org.repo.AuthenticationRepository;
 import tiqr.org.repo.EnrollmentRepository;
 import tiqr.org.repo.RegistrationRepository;
@@ -56,11 +57,12 @@ public class DefaultTiqrService implements TiqrService {
     }
 
     @Override
-    public MetaData getMetaData(String enrollmentKey) {
-        Enrollment enrollment = enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
+    public MetaData getMetaData(String enrollmentKey) throws TiqrException {
+        Enrollment enrollment = enrollmentRepository.findEnrollmentByKey(enrollmentKey)
+                .orElseThrow(() -> new TiqrException("No metadata found with enrollmentKey: " + enrollmentKey));
 
         if (!enrollment.getStatus().equals(EnrollmentStatus.INITIALIZED)) {
-            throw new IllegalArgumentException("Metadata can only be retrieved when the status is INITIALIZED. Current status is " + enrollment.getStatus());
+            throw new TiqrException("Metadata can only be retrieved when the status is INITIALIZED. Current status is " + enrollment.getStatus());
         }
 
         String enrollmentSecret = Challenge.generateNonce();
@@ -74,12 +76,12 @@ public class DefaultTiqrService implements TiqrService {
     }
 
     @Override
-    public Registration enrollData(Registration registration) {
+    public Registration enrollData(Registration registration) throws TiqrException {
         Enrollment enrollment = enrollmentRepository.findEnrollmentByEnrollmentSecret(registration.getEnrollmentSecret())
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new TiqrException("No enrollment found with enrollment secret: " + registration.getEnrollmentSecret()));
 
         if (!enrollment.getStatus().equals(EnrollmentStatus.RETRIEVED)) {
-            throw new IllegalArgumentException("Enrollment can only be called when the status is RETRIEVED. Current status is " + enrollment.getStatus());
+            throw new TiqrException("Enrollment can only be called when the status is RETRIEVED. Current status is " + enrollment.getStatus());
         }
 
         registration.setUserId(enrollment.getUserID());
@@ -104,8 +106,9 @@ public class DefaultTiqrService implements TiqrService {
     }
 
     @Override
-    public Registration finishRegistration(String userId) {
-        Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
+    public Registration finishRegistration(String userId) throws TiqrException {
+        Registration registration = registrationRepository.findRegistrationByUserId(userId)
+                .orElseThrow(() -> new TiqrException("No registration found for user: " + userId));
         registration.setStatus(RegistrationStatus.FINALIZED);
 
         LOG.debug("Finished registration for " + userId);
@@ -114,16 +117,18 @@ public class DefaultTiqrService implements TiqrService {
     }
 
     @Override
-    public Enrollment enrollmentStatus(String enrollmentKey) {
-        return enrollmentRepository.findEnrollmentByKey(enrollmentKey).orElseThrow(IllegalArgumentException::new);
+    public Enrollment enrollmentStatus(String enrollmentKey) throws TiqrException {
+        return enrollmentRepository.findEnrollmentByKey(enrollmentKey)
+                .orElseThrow(() -> new TiqrException("No enrollment found for enrollmentKey: " + enrollmentKey));
     }
 
     @Override
-    public Authentication startAuthentication(String userId, String userDisplayName, String eduIdAppBaseUrl, boolean sendPushNotification) {
-        Registration registration = registrationRepository.findRegistrationByUserId(userId).orElseThrow(IllegalArgumentException::new);
+    public Authentication startAuthentication(String userId, String userDisplayName, String eduIdAppBaseUrl, boolean sendPushNotification) throws TiqrException {
+        Registration registration = registrationRepository.findRegistrationByUserId(userId)
+                .orElseThrow(() -> new TiqrException("No registration found for user: " + userId));
 
         if (!RegistrationStatus.FINALIZED.equals(registration.getStatus())) {
-            throw new IllegalArgumentException("Registration is not FINALIZED, but " + registration.getStatus());
+            throw new TiqrException("Registration is not FINALIZED, but " + registration.getStatus());
         }
         String sessionKey = Challenge.generateSessionKey();
         String challenge = Challenge.generateQH10Challenge();
@@ -147,7 +152,7 @@ public class DefaultTiqrService implements TiqrService {
             try {
                 notificationGateway.push(registration, authenticationUrl);
                 authentication.setPushNotificationSend(true);
-            } catch (RuntimeException e) {
+            } catch (PushNotificationException e) {
                 LOG.error(String.format("Error in pushing notification for user %s and address %s",
                         registration.getUserId(),
                         registration.getNotificationAddress()), e);
@@ -160,15 +165,17 @@ public class DefaultTiqrService implements TiqrService {
     }
 
     @Override
-    public void postAuthentication(AuthenticationData authenticationData) {
+    public void postAuthentication(AuthenticationData authenticationData) throws TiqrException {
         Authentication authentication = authenticationRepository.findAuthenticationBySessionKey(authenticationData.getSessionKey())
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new TiqrException("No authentication found with session key: " + authenticationData.getSessionKey()));
 
         if (!authentication.getStatus().equals(AuthenticationStatus.PENDING)) {
-            throw new IllegalArgumentException("Authentication can only be called when the status is PENDING. Current status is " + authentication.getStatus());
+            throw new TiqrException("Authentication can only be called when the status is PENDING. Current status is " + authentication.getStatus());
         }
 
-        Registration registration = registrationRepository.findRegistrationByUserId(authentication.getUserID()).orElseThrow(IllegalArgumentException::new);
+        Registration registration = registrationRepository.findRegistrationByUserId(authentication.getUserID())
+                .orElseThrow(() -> new TiqrException("No authentication found user: " + authentication.getUserID()));
+
         String decryptedSecret = secretCipher.decrypt(registration.getSecret());
         Challenge.verifyOcra(decryptedSecret, authentication.getChallenge(), authentication.getSessionKey(), authenticationData.getResponse());
 
@@ -187,8 +194,9 @@ public class DefaultTiqrService implements TiqrService {
     }
 
     @Override
-    public Authentication authenticationStatus(String sessionKey) {
-        return authenticationRepository.findAuthenticationBySessionKey(sessionKey).orElseThrow(IllegalArgumentException::new);
+    public Authentication authenticationStatus(String sessionKey) throws TiqrException {
+        return authenticationRepository.findAuthenticationBySessionKey(sessionKey)
+                .orElseThrow(() -> new TiqrException("No authentication found with session key: " + sessionKey));
     }
 
     private String encode(String s) {

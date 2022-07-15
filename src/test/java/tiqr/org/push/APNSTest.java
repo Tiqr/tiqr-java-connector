@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class APNSTest {
 
     @Test
-    void push() throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException, ExecutionException {
+    void push() throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException, ExecutionException, PushNotificationException {
         MockApnsServer server = buildServer(new AcceptAllPushNotificationHandlerFactory(), null);
         server.start(8099).get();
         APNS apns = new APNS(new APNSConfiguration(

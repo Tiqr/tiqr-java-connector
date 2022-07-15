@@ -17,28 +17,28 @@ public interface TiqrService {
      * @param enrollmentKey the unique key of the enrollment
      * @return the MetaData for the Tiqr app
      */
-    MetaData getMetaData(String enrollmentKey);
+    MetaData getMetaData(String enrollmentKey) throws TiqrException;
 
     /**
      * Finish the enrollment
      * @param registration the form data from the Tiqr app
      * @return The updated Registration
      */
-    Registration enrollData(Registration registration);
+    Registration enrollData(Registration registration) throws TiqrException;
 
     /**
      * Finalize the registration after the User has provided a recovery method.
      * @param userId the unique identifier of the User
      * @return the finalized Registration
      */
-    Registration finishRegistration(String userId);
+    Registration finishRegistration(String userId) throws TiqrException;
 
     /**
      * Method to poll the status of the enrollment
      * @param enrollmentKey the unique key of the enrollment
      * @return the enrollment
      */
-    Enrollment enrollmentStatus(String enrollmentKey);
+    Enrollment enrollmentStatus(String enrollmentKey) throws TiqrException;
 
     /**
      * Start an authentication
@@ -48,18 +48,18 @@ public interface TiqrService {
      * @param sendPushNotification indicator if we send push notifications
      * @return New Authentication
      */
-    Authentication startAuthentication(String userId, String userDisplayName, String eduIdAppBaseUrl, boolean sendPushNotification);
+    Authentication startAuthentication(String userId, String userDisplayName, String eduIdAppBaseUrl, boolean sendPushNotification) throws TiqrException;
 
     /**
      * Finish an authentication
      * @param authenticationData form data posted by the Tiqr app
      */
-    void postAuthentication(AuthenticationData authenticationData);
+    void postAuthentication(AuthenticationData authenticationData) throws TiqrException;
 
     /**
      * Method to poll the status of the authentication
      * @param sessionKey the unique key of the authentication
      * @return the authentication
      */
-    Authentication authenticationStatus(String sessionKey);
+    Authentication authenticationStatus(String sessionKey) throws TiqrException;
 }
