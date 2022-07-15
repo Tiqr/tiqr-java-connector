@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.2.9]
 
-If lookups fail or authentications or registrations have an invalid status, then throw TiqrException
+If lookups fail or authentications or registrations have an invalid status,
+then throw TiqrException
 
 ## [0.2.8]
 
-If Apple Push Notification is rejected, throw error (to force the display of QR code in the client)
+If Apple Push Notification is rejected, throw error (to force the display of
+QR code in the client)
 
 ## [0.2.7]
 
