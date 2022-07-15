@@ -63,6 +63,11 @@ public class APNS implements PushNotifier {
 
             if (!response.isAccepted()) {
             	LOG.warn(String.format("Message to user %s not accepted. Response: %s", userId, response));
+                // Must throw Exception, otherwise the not accepted status is not picked up
+                throw new PushNotificationException(String.format(
+                        "Push notification APNS for user %s and token %s is not accepted, because of %s",
+                        userId, notificationAddress, response.getRejectionReason()
+                ));
             }
 
             return id;
