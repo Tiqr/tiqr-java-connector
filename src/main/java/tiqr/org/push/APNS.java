@@ -7,6 +7,7 @@ import com.eatthepath.pushy.apns.auth.ApnsSigningKey;
 import com.eatthepath.pushy.apns.util.ApnsPayloadBuilder;
 import com.eatthepath.pushy.apns.util.SimpleApnsPayloadBuilder;
 import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
+import com.eatthepath.pushy.apns.util.TokenUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -31,9 +32,13 @@ public class APNS implements PushNotifier {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
         Resource signingKeyResource = resourceLoader.getResource(apnsConfiguration.getSigningKey());
         ApnsClientBuilder apnsClientBuilder = new ApnsClientBuilder()
-                .setApnsServer(apnsConfiguration.getServerHost(), apnsConfiguration.getPort())
-                .setSigningKey(ApnsSigningKey.loadFromInputStream(signingKeyResource.getInputStream(),
-                        apnsConfiguration.getTeamId(), apnsConfiguration.getKeyId()));
+                .setApnsServer(
+                        apnsConfiguration.getServerHost(),
+                        apnsConfiguration.getPort())
+                .setSigningKey(ApnsSigningKey.loadFromInputStream(
+                        signingKeyResource.getInputStream(),
+                        apnsConfiguration.getTeamId(),
+                        apnsConfiguration.getKeyId()));
         //For integration testing
         if (StringUtils.hasText(apnsConfiguration.getServerCertificateChain())) {
             Resource serverCertificateChainResource = resourceLoader.getResource(apnsConfiguration.getServerCertificateChain());
@@ -62,7 +67,7 @@ public class APNS implements PushNotifier {
             String id = response.getApnsId().toString();
 
             if (!response.isAccepted()) {
-            	LOG.warn(String.format("Message to user %s not accepted. Response: %s", userId, response));
+                LOG.warn(String.format("Message to user %s not accepted. Response: %s", userId, response));
                 // Must throw Exception, otherwise the not accepted status is not picked up
                 throw new PushNotificationException(String.format(
                         "Push notification APNS for user %s and token %s is not accepted, because of %s",
