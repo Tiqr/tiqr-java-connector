@@ -14,7 +14,8 @@ public class Challenge {
 
     static {
         try {
-            secureRandom = SecureRandom.getInstanceStrong();
+            secureRandom = SecureRandom.getInstance("NativePRNGNonBlocking");
+//            secureRandom = SecureRandom.getInstanceStrong();
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(e);
         }
