@@ -10,16 +10,7 @@ import java.util.stream.Collectors;
 
 public class Challenge {
 
-    private static final SecureRandom secureRandom;
-
-    static {
-        try {
-            secureRandom = SecureRandom.getInstance("NativePRNGNonBlocking");
-//            secureRandom = SecureRandom.getInstanceStrong();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
+    private static final SecureRandom secureRandom = new SecureRandom();
 
     private Challenge() {
     }
