@@ -130,6 +130,7 @@ public class DefaultTiqrService implements TiqrService {
         if (!RegistrationStatus.FINALIZED.equals(registration.getStatus())) {
             throw new TiqrException("Registration is not FINALIZED, but " + registration.getStatus());
         }
+
         String sessionKey = Challenge.generateSessionKey();
         String challenge = Challenge.generateQH10Challenge();
         String authenticationUrl = String.format("%s/tiqrauth/?u=%s&s=%s&q=%s&i=%s&v=%s",
@@ -181,11 +182,11 @@ public class DefaultTiqrService implements TiqrService {
 
 
         String notificationAddress = authenticationData.getNotificationAddress();
-        if (StringUtils.hasText(notificationAddress)) {
+        if (StringUtils.hasText(notificationAddress) && !notificationAddress.equals(registration.getNotificationAddress())) {
             registration.setNotificationAddress(notificationAddress);
+            registration.setUpdated(Instant.now());
+            registrationRepository.save(registration);
         }
-        registration.setUpdated(Instant.now());
-        registrationRepository.save(registration);
 
         authentication.update(AuthenticationStatus.SUCCESS);
         authenticationRepository.save(authentication);
