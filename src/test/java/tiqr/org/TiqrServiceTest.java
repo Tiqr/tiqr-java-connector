@@ -1,7 +1,6 @@
 package tiqr.org;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import tiqr.org.model.*;
 import tiqr.org.push.APNSConfiguration;
@@ -137,17 +136,6 @@ class TiqrServiceTest {
         when(enrollmentRepository.findEnrollmentByEnrollmentSecret(registration.getEnrollmentSecret())).thenReturn(Optional.of(enrollment));
 
         assertThrows(IllegalArgumentException.class, () -> tiqrService.enrollData(registration));
-    }
-
-    @Test
-    void decryptRegistrationSecret() {
-        Registration registration = new Registration();
-        SecretCipher secretCipher = (SecretCipher) ReflectionTestUtils.getField(tiqrService,"secretCipher");
-
-        String secret = UUID.randomUUID().toString();
-        registration.setSecret(secretCipher.encrypt(secret));
-        String decryptedSecret = tiqrService.decryptRegistrationSecret(registration);
-        assertEquals(secret, decryptedSecret);
     }
 
     @Test

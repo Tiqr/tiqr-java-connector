@@ -199,11 +199,6 @@ public class DefaultTiqrService implements TiqrService {
                 .orElseThrow(() -> new TiqrException("No authentication found with session key: " + sessionKey));
     }
 
-    @Override
-    public String decryptRegistrationSecret(Registration registration) {
-        return secretCipher.decrypt(registration.getSecret());
-    }
-
     private String encode(String s) {
         return URLEncoder.encode(s, Charset.defaultCharset());
     }
