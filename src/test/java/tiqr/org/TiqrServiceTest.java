@@ -1,6 +1,7 @@
 package tiqr.org;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import tiqr.org.model.*;
 import tiqr.org.push.APNSConfiguration;
@@ -10,7 +11,6 @@ import tiqr.org.repo.EnrollmentRepository;
 import tiqr.org.repo.RegistrationRepository;
 import tiqr.org.secure.Challenge;
 import tiqr.org.secure.OCRA;
-import tiqr.org.secure.SecretCipher;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -42,7 +42,8 @@ class TiqrServiceTest {
                     "http://localhost/authention",
                     true,
                     "http://localhost/enroll"
-            ), "secret",
+            ),
+            "secret",
             new APNSConfiguration(
                     "localhost",
                     8099,
@@ -136,6 +137,17 @@ class TiqrServiceTest {
         when(enrollmentRepository.findEnrollmentByEnrollmentSecret(registration.getEnrollmentSecret())).thenReturn(Optional.of(enrollment));
 
         assertThrows(IllegalArgumentException.class, () -> tiqrService.enrollData(registration));
+    }
+
+    @Test
+    void decryptRegistrationSecret() {
+        Registration registration = new Registration();
+        SecretCipher secretCipher = (SecretCipher) ReflectionTestUtils.getField(tiqrService,"secretCipher");
+
+        String secret = UUID.randomUUID().toString();
+        registration.setSecret(secretCipher.encrypt(secret));
+        String decryptedSecret = tiqrService.decryptRegistrationSecret(registration);
+        assertEquals(secret, decryptedSecret);
     }
 
     @Test

@@ -62,4 +62,11 @@ public interface TiqrService {
      * @return the authentication
      */
     Authentication authenticationStatus(String sessionKey) throws TiqrException;
+
+    /**
+     *
+     * @param registration valid Registration containing a secret
+     * @return the decrypted secret
+     */
+    String decryptRegistrationSecret(Registration registration);
 }

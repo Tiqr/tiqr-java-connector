@@ -12,7 +12,6 @@ import tiqr.org.repo.AuthenticationRepository;
 import tiqr.org.repo.EnrollmentRepository;
 import tiqr.org.repo.RegistrationRepository;
 import tiqr.org.secure.Challenge;
-import tiqr.org.secure.SecretCipher;
 
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -198,6 +197,11 @@ public class DefaultTiqrService implements TiqrService {
     public Authentication authenticationStatus(String sessionKey) throws TiqrException {
         return authenticationRepository.findAuthenticationBySessionKey(sessionKey)
                 .orElseThrow(() -> new TiqrException("No authentication found with session key: " + sessionKey));
+    }
+
+    @Override
+    public String decryptRegistrationSecret(Registration registration) {
+        return secretCipher.decrypt(registration.getSecret());
     }
 
     private String encode(String s) {
