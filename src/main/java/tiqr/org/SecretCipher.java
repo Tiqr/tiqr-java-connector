@@ -13,14 +13,14 @@ import java.util.Base64;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-class SecretCipher {
+public class SecretCipher {
 
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
     private final SecretKeySpec secretKey;
     private final GCMParameterSpec parameterSpec;
 
     @SneakyThrows
-    SecretCipher(String secret) {
+    public SecretCipher(String secret) {
         MessageDigest sha = MessageDigest.getInstance("SHA-256");
         byte[] digest = sha.digest(secret.getBytes(UTF_8));
         this.secretKey = new SecretKeySpec(Arrays.copyOf(digest, 32), "AES");
