@@ -62,4 +62,11 @@ public interface TiqrService {
      * @return the authentication
      */
     Authentication authenticationStatus(String sessionKey) throws TiqrException;
+
+    /**
+     * Mark the authentication as suspended
+     * @param sessionKey the unique key of the authentication
+     * @return the authentication
+     */
+    Authentication suspendAuthentication(String sessionKey) throws TiqrException;
 }

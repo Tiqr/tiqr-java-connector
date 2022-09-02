@@ -169,6 +169,21 @@ class TiqrServiceTest {
                         "notificationAddress")));
     }
 
+    @Test
+    void suspendAuthentication() throws TiqrException {
+        String sessionKey = Challenge.generateSessionKey();
+        Authentication authentication = new Authentication(
+                "user-id",
+                "John Doe",
+                sessionKey,
+                Challenge.generateQH10Challenge(),
+                "https://eduid.nl/tiqrauth",
+                AuthenticationStatus.PENDING);
+        when(authenticationRepository.findAuthenticationBySessionKey(sessionKey)).thenReturn(Optional.of(authentication));
+        authentication = tiqrService.suspendAuthentication(sessionKey);
+        assertEquals(AuthenticationStatus.SUSPENDED, authentication.getStatus());
+    }
+
     private Registration getRegistration(String enrollmentSecret) {
         Registration registration = new Registration();
         registration.setUserId("user-id");

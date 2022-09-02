@@ -16,6 +16,7 @@ import tiqr.org.secure.Challenge;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.time.Instant;
+import java.util.List;
 
 public class DefaultTiqrService implements TiqrService {
 
@@ -99,7 +100,7 @@ public class DefaultTiqrService implements TiqrService {
         enrollment.update(EnrollmentStatus.PROCESSED);
         enrollmentRepository.save(enrollment);
 
-        LOG.debug("Preliminary registration for " + enrollment.getUserID());
+        LOG.debug("Processed registration for " + enrollment.getUserID());
 
         return savedRegistration;
     }
@@ -169,8 +170,8 @@ public class DefaultTiqrService implements TiqrService {
         Authentication authentication = authenticationRepository.findAuthenticationBySessionKey(authenticationData.getSessionKey())
                 .orElseThrow(() -> new TiqrException("No authentication found with session key: " + authenticationData.getSessionKey()));
 
-        if (!authentication.getStatus().equals(AuthenticationStatus.PENDING)) {
-            throw new TiqrException("Authentication can only be called when the status is PENDING. Current status is " + authentication.getStatus());
+        if (!List.of(AuthenticationStatus.PENDING, AuthenticationStatus.SUSPENDED).contains(authentication.getStatus())) {
+            throw new TiqrException("Authentication can only be called when the status is PENDING or SUSPENDED. Current status is " + authentication.getStatus());
         }
 
         Registration registration = registrationRepository.findRegistrationByUserId(authentication.getUserID())
@@ -178,7 +179,6 @@ public class DefaultTiqrService implements TiqrService {
 
         String decryptedSecret = secretCipher.decrypt(registration.getSecret());
         Challenge.verifyOcra(decryptedSecret, authentication.getChallenge(), authentication.getSessionKey(), authenticationData.getResponse());
-
 
         String notificationAddress = authenticationData.getNotificationAddress();
         if (StringUtils.hasText(notificationAddress) && !notificationAddress.equals(registration.getNotificationAddress())) {
@@ -197,6 +197,15 @@ public class DefaultTiqrService implements TiqrService {
     public Authentication authenticationStatus(String sessionKey) throws TiqrException {
         return authenticationRepository.findAuthenticationBySessionKey(sessionKey)
                 .orElseThrow(() -> new TiqrException("No authentication found with session key: " + sessionKey));
+    }
+
+    @Override
+    public Authentication suspendAuthentication(String sessionKey) throws TiqrException {
+        Authentication authentication = authenticationRepository.findAuthenticationBySessionKey(sessionKey)
+                .orElseThrow(() -> new TiqrException("No authentication found with session key: " + sessionKey));
+        authentication.setStatus(AuthenticationStatus.SUSPENDED);
+        authenticationRepository.save(authentication);
+        return authentication;
     }
 
     private String encode(String s) {
