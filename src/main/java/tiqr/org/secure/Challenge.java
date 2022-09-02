@@ -40,7 +40,7 @@ public class Challenge {
         String ocra = OCRA.generateOCRA(secret, challenge, sessionKey);
         boolean equals = MessageDigest.isEqual(ocra.getBytes(StandardCharsets.UTF_8), expectedOcra.getBytes(StandardCharsets.UTF_8));
         if (!equals) {
-            throw new IllegalArgumentException(String.format("Response does not match. Expected %s, but got %s", ocra, expectedOcra));
+            throw new IllegalArgumentException("User used an incorrect tiqr response");
         }
     }
 
