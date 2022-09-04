@@ -203,7 +203,7 @@ public class DefaultTiqrService implements TiqrService {
     public Authentication suspendAuthentication(String sessionKey) throws TiqrException {
         Authentication authentication = authenticationRepository.findAuthenticationBySessionKey(sessionKey)
                 .orElseThrow(() -> new TiqrException("No authentication found with session key: " + sessionKey));
-        authentication.setStatus(AuthenticationStatus.SUSPENDED);
+        authentication.update(AuthenticationStatus.SUSPENDED);
         authenticationRepository.save(authentication);
         return authentication;
     }
