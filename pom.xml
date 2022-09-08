@@ -10,7 +10,7 @@
 
     <groupId>org.openconext</groupId>
     <artifactId>tiqr-java-connector</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <name>tiqr-java-connector</name>
 
     <dependencies>

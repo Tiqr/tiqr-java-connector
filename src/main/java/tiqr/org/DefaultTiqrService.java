@@ -154,9 +154,7 @@ public class DefaultTiqrService implements TiqrService {
                 notificationGateway.push(registration, authenticationUrl);
                 authentication.setPushNotificationSend(true);
             } catch (PushNotificationException e) {
-                LOG.error(String.format("Error in pushing notification for user %s and address %s",
-                        registration.getUserId(),
-                        registration.getNotificationAddress()), e);
+                LOG.info(e.getMessage());
             }
         }
 
