@@ -181,9 +181,9 @@ public class DefaultTiqrService implements TiqrService {
         String notificationAddress = authenticationData.getNotificationAddress();
         if (StringUtils.hasText(notificationAddress) && !notificationAddress.equals(registration.getNotificationAddress())) {
             registration.setNotificationAddress(notificationAddress);
-            registration.setUpdated(Instant.now());
-            registrationRepository.save(registration);
         }
+        registration.setUpdated(Instant.now());
+        registrationRepository.save(registration);
 
         authentication.update(AuthenticationStatus.SUCCESS);
         authenticationRepository.save(authentication);
