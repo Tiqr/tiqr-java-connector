@@ -10,7 +10,7 @@ public interface TiqrService {
      * @param userDisplayName displayName of the User
      * @return new Enrollment
      */
-    Enrollment startEnrollment(String userID, String userDisplayName);
+    Enrollment startEnrollment(String userID, String userDisplayName) throws TiqrException;
 
     /**
      * Retrieve the MetaData

@@ -17,6 +17,7 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public class DefaultTiqrService implements TiqrService {
 
@@ -46,9 +47,13 @@ public class DefaultTiqrService implements TiqrService {
     }
 
     @Override
-    public Enrollment startEnrollment(String userID, String userDisplayName) {
+    public Enrollment startEnrollment(String userID, String userDisplayName) throws TiqrException {
+        Optional<Registration> registrationByUserId = registrationRepository.findRegistrationByUserId(userID);
+        if (registrationByUserId.isPresent()) {
+            throw new TiqrException("Enrollment can not be started when there is an existing registration");
+        }
+
         enrollmentRepository.deleteByUserID(userID);
-        registrationRepository.deleteByUserId(userID);
 
         LOG.debug("Starting enrollment for user " + userID);
 

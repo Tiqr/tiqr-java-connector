@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -182,6 +183,13 @@ class TiqrServiceTest {
         when(authenticationRepository.findAuthenticationBySessionKey(sessionKey)).thenReturn(Optional.of(authentication));
         authentication = tiqrService.suspendAuthentication(sessionKey);
         assertEquals(AuthenticationStatus.SUSPENDED, authentication.getStatus());
+    }
+
+    @Test
+    void enrollmentScenarioExistingRegistration() {
+        when(registrationRepository.findRegistrationByUserId(anyString())).thenReturn(Optional.of(new Registration()));
+        String userId = "user-id";
+        assertThrows(TiqrException.class, () -> tiqrService.startEnrollment(userId, "John Doe"));
     }
 
     private Registration getRegistration(String enrollmentSecret) {
