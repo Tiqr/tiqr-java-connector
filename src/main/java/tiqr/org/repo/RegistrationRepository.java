@@ -12,4 +12,5 @@ public interface RegistrationRepository {
 
     Long deleteByUserId(String userId);
 
+    void delete(Registration entity);
 }

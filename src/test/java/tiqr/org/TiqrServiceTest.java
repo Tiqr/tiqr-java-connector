@@ -187,9 +187,25 @@ class TiqrServiceTest {
 
     @Test
     void enrollmentScenarioExistingRegistration() {
-        when(registrationRepository.findRegistrationByUserId(anyString())).thenReturn(Optional.of(new Registration()));
+        Registration registration = new Registration();
+        registration.setStatus(RegistrationStatus.FINALIZED);
+        when(registrationRepository.findRegistrationByUserId(anyString())).thenReturn(Optional.of(registration));
         String userId = "user-id";
         assertThrows(TiqrException.class, () -> tiqrService.startEnrollment(userId, "John Doe"));
+    }
+
+    @Test
+    void enrollmentScenarioExistingInitializedRegistration() throws TiqrException {
+        Registration registration = new Registration();
+        registration.setStatus(RegistrationStatus.INITIALIZED);
+        when(registrationRepository.findRegistrationByUserId(anyString())).thenReturn(Optional.of(registration));
+        String userId = "user-id";
+        when(enrollmentRepository.save(any(Enrollment.class))).thenAnswer(i -> i.getArguments()[0]);
+        Enrollment enrollment = tiqrService.startEnrollment(userId, "John Doe");
+
+        assertEquals(EnrollmentStatus.INITIALIZED, enrollment.getStatus());
+        assertNotNull(enrollment.getKey());
+
     }
 
     private Registration getRegistration(String enrollmentSecret) {

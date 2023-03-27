@@ -50,7 +50,12 @@ public class DefaultTiqrService implements TiqrService {
     public Enrollment startEnrollment(String userID, String userDisplayName) throws TiqrException {
         Optional<Registration> registrationByUserId = registrationRepository.findRegistrationByUserId(userID);
         if (registrationByUserId.isPresent()) {
-            throw new TiqrException("Enrollment can not be started when there is an existing registration");
+            Registration registration = registrationByUserId.get();
+            if (RegistrationStatus.FINALIZED.equals(registration.getStatus())) {
+                throw new TiqrException("Enrollment can not be started when there is an existing registration");
+            } else {
+                registrationRepository.delete(registration);
+            }
         }
 
         enrollmentRepository.deleteByUserID(userID);
