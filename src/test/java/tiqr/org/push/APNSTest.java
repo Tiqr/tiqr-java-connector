@@ -1,6 +1,9 @@
 package tiqr.org.push;
 
-import com.eatthepath.pushy.apns.server.*;
+import com.eatthepath.pushy.apns.server.AcceptAllPushNotificationHandlerFactory;
+import com.eatthepath.pushy.apns.server.MockApnsServer;
+import com.eatthepath.pushy.apns.server.MockApnsServerBuilder;
+import com.eatthepath.pushy.apns.server.PushNotificationHandlerFactory;
 import io.netty.channel.nio.NioEventLoopGroup;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -17,11 +20,11 @@ class APNSTest {
 
     @Test
     void push() throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException, ExecutionException, PushNotificationException {
-        MockApnsServer server = buildServer(new AcceptAllPushNotificationHandlerFactory(), null);
-        server.start(8099).get();
+        MockApnsServer server = buildServer(new AcceptAllPushNotificationHandlerFactory());
+        Integer port = server.start(8099).get();
         APNS apns = new APNS(new APNSConfiguration(
                 "localhost",
-                8099,
+                port,
                 "classpath:/token-auth-private-key.p8",
                 "classpath:/ca.pem",
                 "topic",
@@ -35,7 +38,7 @@ class APNSTest {
         server.shutdown().get();
     }
 
-    protected MockApnsServer buildServer(final PushNotificationHandlerFactory handlerFactory, final MockApnsServerListener listener) throws IOException {
+    protected MockApnsServer buildServer(final PushNotificationHandlerFactory handlerFactory) throws IOException {
         return new MockApnsServerBuilder()
                 .setServerCredentials(
                         new ClassPathResource("server-certs.pem").getInputStream(),
@@ -44,7 +47,6 @@ class APNSTest {
                 .setTrustedClientCertificateChain(new ClassPathResource("ca.pem").getInputStream())
                 .setEventLoopGroup(new NioEventLoopGroup(2))
                 .setHandlerFactory(handlerFactory)
-                .setListener(listener)
                 .build();
     }
 
