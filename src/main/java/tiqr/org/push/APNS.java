@@ -54,7 +54,9 @@ public class APNS implements PushNotifier {
 
         ApnsPayloadBuilder payloadBuilder = new SimpleApnsPayloadBuilder();
         payloadBuilder.setAlertBody("Please log in");
+        payloadBuilder.setMutableContent(true);
         payloadBuilder.addCustomProperty("challenge", authorizationUrl);
+        payloadBuilder.addCustomProperty("authenticationTimeout", 30L);
 
         String payload = payloadBuilder.build();
         SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(notificationAddress, this.topic, payload);
