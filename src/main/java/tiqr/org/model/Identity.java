@@ -13,7 +13,7 @@ public class Identity {
     private String displayName;
 
     public Identity(Enrollment enrollment) {
-        this.identifier = enrollment.getUserID();
+        this.identifier = enrollment.getId();
         this.displayName = enrollment.getUserDisplayName();
     }
 }

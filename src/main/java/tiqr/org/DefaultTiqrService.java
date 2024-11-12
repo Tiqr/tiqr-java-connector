@@ -81,7 +81,7 @@ public class DefaultTiqrService implements TiqrService {
 
         LOG.debug("Get metadata for enrollment for user " + enrollment.getUserID());
 
-        enrollmentRepository.save(enrollment);
+        enrollment = enrollmentRepository.save(enrollment);
         return new MetaData(Service.addEnrollmentSecret(this.service, enrollmentSecret), new Identity(enrollment));
     }
 
@@ -104,6 +104,7 @@ public class DefaultTiqrService implements TiqrService {
         Instant now = Instant.now();
         registration.setCreated(now);
         registration.setUpdated(now);
+        registration.setUseDocumentIdentifier(true);
 
         Registration savedRegistration = registrationRepository.save(registration);
 
@@ -145,7 +146,7 @@ public class DefaultTiqrService implements TiqrService {
         String challenge = Challenge.generateQH10Challenge();
         String authenticationUrl = String.format("%s/tiqrauth/?u=%s&s=%s&q=%s&i=%s&v=%s",
                 eduIdAppBaseUrl,
-                encode(userId),
+                encode(registration.isUseDocumentIdentifier() ? registration.getId() : userId),
                 encode(sessionKey),
                 encode(challenge),
                 encode(this.service.getIdentifier()),
