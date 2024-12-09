@@ -23,6 +23,7 @@ public class Enrollment implements Serializable {
     private String userID;
     private String userDisplayName;
     private EnrollmentStatus status;
+    private String registrationId;
     private Instant created;
     private Instant updated;
 

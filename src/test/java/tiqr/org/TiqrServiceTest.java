@@ -73,6 +73,7 @@ class TiqrServiceTest {
         assertNotNull(enrollmentSecret);
 
         assertEquals(EnrollmentStatus.RETRIEVED, tiqrService.enrollmentStatus(enrollment.getKey()).getStatus());
+        assertEquals(metaData.getIdentity().getIdentifier(), enrollment.getRegistrationId());
 
         when(enrollmentRepository.save(any(Enrollment.class))).thenAnswer(i -> i.getArguments()[0]);
         when(registrationRepository.save(any(Registration.class))).thenAnswer(i -> i.getArguments()[0]);
@@ -80,6 +81,7 @@ class TiqrServiceTest {
 
         Registration registration = getRegistration(enrollmentSecret);
         Registration result = tiqrService.enrollData(registration);
+        assertEquals(metaData.getIdentity().getIdentifier(), registration.getId());
 
         SecretCipher cipher = new SecretCipher("secret");
         assertEquals(result.getSecret(), cipher.encrypt(sharedSecret));

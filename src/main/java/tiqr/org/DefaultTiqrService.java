@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class DefaultTiqrService implements TiqrService {
 
@@ -81,7 +82,8 @@ public class DefaultTiqrService implements TiqrService {
 
         LOG.debug("Get metadata for enrollment for user " + enrollment.getUserID());
 
-        enrollmentRepository.save(enrollment);
+        enrollment.setRegistrationId(UUID.randomUUID().toString());
+        enrollment = enrollmentRepository.save(enrollment);
         return new MetaData(Service.addEnrollmentSecret(this.service, enrollmentSecret), new Identity(enrollment));
     }
 
@@ -104,6 +106,8 @@ public class DefaultTiqrService implements TiqrService {
         Instant now = Instant.now();
         registration.setCreated(now);
         registration.setUpdated(now);
+        registration.setId(enrollment.getRegistrationId());
+        registration.setUsePrimaryIdentifier(true);
 
         Registration savedRegistration = registrationRepository.save(registration);
 
@@ -145,7 +149,7 @@ public class DefaultTiqrService implements TiqrService {
         String challenge = Challenge.generateQH10Challenge();
         String authenticationUrl = String.format("%s/tiqrauth/?u=%s&s=%s&q=%s&i=%s&v=%s",
                 eduIdAppBaseUrl,
-                encode(userId),
+                encode(registration.isUsePrimaryIdentifier() ? registration.getId() : userId),
                 encode(sessionKey),
                 encode(challenge),
                 encode(this.service.getIdentifier()),
