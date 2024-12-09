@@ -5,12 +5,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>21</java.version>
+        <java.version>11</java.version>
     </properties>
 
     <groupId>org.openconext</groupId>
     <artifactId>tiqr-java-connector</artifactId>
-    <version>2.0.0</version>
+    <version>1.1.4-SNAPSHOT</version>
     <name>tiqr-java-connector</name>
 
     <dependencies>
@@ -33,13 +33,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.37</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.37</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -118,13 +118,13 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>21</release>
+                    <release>11</release>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.2.5</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.junit.jupiter</groupId>
@@ -168,7 +168,7 @@
                                     <version>3.8.4</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>21</version>
+                                    <version>11</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>

@@ -210,7 +210,6 @@ class TiqrServiceTest {
 
     private Registration getRegistration(String enrollmentSecret) {
         Registration registration = new Registration();
-        registration.setId(UUID.randomUUID().toString());
         registration.setUserId("user-id");
         registration.setSecret(sharedSecret);
         registration.setEnrollmentSecret(enrollmentSecret);
