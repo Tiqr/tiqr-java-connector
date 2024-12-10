@@ -28,7 +28,7 @@ public class Registration implements Serializable {
     private RegistrationStatus status;
     private Instant created;
     private Instant updated;
-    private boolean usePrimaryIdentifier;
+    private boolean useRegistrationId;
 
     public void validateForInitialEnrollment() {
         validateForPushNotification();

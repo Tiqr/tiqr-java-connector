@@ -107,7 +107,7 @@ public class DefaultTiqrService implements TiqrService {
         registration.setCreated(now);
         registration.setUpdated(now);
         registration.setId(enrollment.getRegistrationId());
-        registration.setUsePrimaryIdentifier(true);
+        registration.setUseRegistrationId(true);
 
         Registration savedRegistration = registrationRepository.save(registration);
 
@@ -149,7 +149,7 @@ public class DefaultTiqrService implements TiqrService {
         String challenge = Challenge.generateQH10Challenge();
         String authenticationUrl = String.format("%s/tiqrauth/?u=%s&s=%s&q=%s&i=%s&v=%s",
                 eduIdAppBaseUrl,
-                encode(registration.isUsePrimaryIdentifier() ? registration.getId() : userId),
+                encode(registration.isUseRegistrationId() ? registration.getId() : userId),
                 encode(sessionKey),
                 encode(challenge),
                 encode(this.service.getIdentifier()),
