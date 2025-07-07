@@ -165,6 +165,7 @@ public class DefaultTiqrService implements TiqrService {
 
         if (sendPushNotification) {
             try {
+                LOG.info(String.format("Sending push notification to %s for user %s", registration.getNotificationAddress(), userDisplayName));
                 notificationGateway.push(registration, authenticationUrl);
                 authentication.setPushNotificationSend(true);
             } catch (PushNotificationException e) {
