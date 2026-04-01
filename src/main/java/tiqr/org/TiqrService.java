@@ -45,10 +45,11 @@ public interface TiqrService {
      * @param userId the unique identifier of the User
      * @param userDisplayName displayName of the User
      * @param eduIdAppBaseUrl the base URL of the eduID / Tiqr App
+     * @param serviceName the name of the service where the user is logging in
      * @param sendPushNotification indicator if we send push notifications
      * @return New Authentication
      */
-    Authentication startAuthentication(String userId, String userDisplayName, String eduIdAppBaseUrl, boolean sendPushNotification) throws TiqrException;
+    Authentication startAuthentication(String userId, String userDisplayName, String eduIdAppBaseUrl, String serviceName, boolean sendPushNotification) throws TiqrException;
 
     /**
      * Finish an authentication

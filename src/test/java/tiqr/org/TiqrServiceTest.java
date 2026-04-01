@@ -89,13 +89,13 @@ class TiqrServiceTest {
         when(registrationRepository.findRegistrationByUserId(userId))
                 .thenReturn(Optional.of(registration));
         assertThrows(TiqrException.class, () ->
-                tiqrService.startAuthentication(userId, "John Doe", "https://eduid.nl/tiqrauth", false));
+                tiqrService.startAuthentication(userId, "John Doe", "https://eduid.nl/tiqrauth", "testServiceName", false));
 
         tiqrService.finishRegistration(userId);
         assertEquals(RegistrationStatus.FINALIZED, registration.getStatus());
 
         when(authenticationRepository.save(any(Authentication.class))).thenAnswer(i -> i.getArguments()[0]);
-        Authentication authentication = tiqrService.startAuthentication(userId, "John Doe", "https://eduid.nl/tiqrauth", false);
+        Authentication authentication = tiqrService.startAuthentication(userId, "John Doe", "https://eduid.nl/tiqrauth", "testServiceName", false);
 
         when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey()))
                 .thenReturn(Optional.of(authentication));

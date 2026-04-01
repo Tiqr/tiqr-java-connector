@@ -33,7 +33,7 @@ class APNSTest {
         Registration registration = new Registration();
         registration.setUserId("userId");
         registration.setNotificationAddress("123456789");
-        String uuid = apns.push(registration, "https://eduid.nl/tiqrauth");
+        String uuid = apns.push(registration, "https://eduid.nl/tiqrauth", "testServiceName");
         assertNotNull(uuid);
         server.shutdown().get();
     }

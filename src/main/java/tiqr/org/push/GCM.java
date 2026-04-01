@@ -36,7 +36,8 @@ public class GCM implements PushNotifier {
         this.firebaseMessaging = FirebaseMessaging.getInstance(app);
     }
 
-    public String push(Registration registration, String authorizationUrl) throws PushNotificationException {
+    @Override
+    public String push(Registration registration, String authorizationUrl, String serviceName) throws PushNotificationException {
         String notificationAddress = registration.getNotificationAddress();
         String userId = registration.getUserId();
 
@@ -45,7 +46,8 @@ public class GCM implements PushNotifier {
                 .setToken(notificationAddress)
                 .putAllData(Map.of(
                         "text", "Please log in",
-                        "challenge", authorizationUrl
+                        "challenge", authorizationUrl,
+                        "serviceName", serviceName
                 ))
                 .build();
         try {

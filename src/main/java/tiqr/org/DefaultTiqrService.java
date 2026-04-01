@@ -137,7 +137,7 @@ public class DefaultTiqrService implements TiqrService {
     }
 
     @Override
-    public Authentication startAuthentication(String userId, String userDisplayName, String eduIdAppBaseUrl, boolean sendPushNotification) throws TiqrException {
+    public Authentication startAuthentication(String userId, String userDisplayName, String eduIdAppBaseUrl, String serviceName, boolean sendPushNotification) throws TiqrException {
         Registration registration = registrationRepository.findRegistrationByUserId(userId)
                 .orElseThrow(() -> new TiqrException("No registration found for user: " + userId));
 
@@ -165,8 +165,13 @@ public class DefaultTiqrService implements TiqrService {
 
         if (sendPushNotification) {
             try {
-                LOG.info(String.format("Sending push notification to %s for user %s", registration.getNotificationAddress(), userDisplayName));
-                notificationGateway.push(registration, authenticationUrl);
+                LOG.info(String.format(
+                        "Sending push notification (%s) to %s for user %s",
+                        serviceName,
+                        registration.getNotificationAddress(),
+                        userDisplayName
+                ));
+                notificationGateway.push(registration, authenticationUrl, serviceName);
                 authentication.setPushNotificationSend(true);
             } catch (PushNotificationException e) {
                 LOG.info(e.getMessage());

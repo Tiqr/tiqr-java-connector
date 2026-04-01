@@ -59,7 +59,7 @@ class NotificationGatewayTest {
     @Test
     void pushAPNS() throws PushNotificationException {
         Registration registration = getRegistration("APNS");
-        String uuid = notificationGateway.push(registration, "https://eduid.nl/tiqrauth");
+        String uuid = notificationGateway.push(registration, "https://eduid.nl/tiqrauth", "testServiceName");
         assertNotNull(uuid);
     }
 
@@ -67,7 +67,7 @@ class NotificationGatewayTest {
     void pushAPNSException() {
         server.shutdown();
         Registration registration = getRegistration("APNS");
-        assertThrows(PushNotificationException.class, () -> notificationGateway.push(registration, "https://eduid.nl/tiqrauth"));
+        assertThrows(PushNotificationException.class, () -> notificationGateway.push(registration, "https://eduid.nl/tiqrauth", "testServiceName"));
     }
 
     @Test
@@ -85,13 +85,13 @@ class NotificationGatewayTest {
         stubFor(post(urlPathMatching("/message")).willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withBody(messageResponse)));
-        String uuid = notificationGateway.push(registration, "https://eduid.nl/tiqrauth");
+        String uuid = notificationGateway.push(registration, "https://eduid.nl/tiqrauth", "testServiceName");
         assertEquals("test", uuid);
 
         stubFor(post(urlPathMatching("/message")).willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(401)));
-        assertThrows(PushNotificationException.class, () -> notificationGateway.push(registration, "https://eduid.nl/tiqrauth"));
+        assertThrows(PushNotificationException.class, () -> notificationGateway.push(registration, "https://eduid.nl/tiqrauth", "testServiceName"));
     }
 
     private Registration getRegistration(String notificationType) {
