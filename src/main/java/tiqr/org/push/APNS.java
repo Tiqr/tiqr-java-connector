@@ -48,7 +48,8 @@ public class APNS implements PushNotifier {
         this.topic = apnsConfiguration.getTopic();
     }
 
-    public String push(Registration registration, String authorizationUrl) throws PushNotificationException {
+    @Override
+    public String push(Registration registration, String authorizationUrl, String serviceName) throws PushNotificationException {
         String notificationAddress = registration.getNotificationAddress();
         String userId = registration.getUserId();
 
@@ -57,6 +58,7 @@ public class APNS implements PushNotifier {
         payloadBuilder.setMutableContent(true);
         payloadBuilder.addCustomProperty("challenge", authorizationUrl);
         payloadBuilder.addCustomProperty("authenticationTimeout", 30L);
+        payloadBuilder.addCustomProperty("serviceName", serviceName);
 
         String payload = payloadBuilder.build();
         SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(notificationAddress, this.topic, payload);
