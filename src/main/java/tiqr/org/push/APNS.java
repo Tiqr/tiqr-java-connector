@@ -5,6 +5,7 @@ import com.eatthepath.pushy.apns.ApnsClientBuilder;
 import com.eatthepath.pushy.apns.PushNotificationResponse;
 import com.eatthepath.pushy.apns.auth.ApnsSigningKey;
 import com.eatthepath.pushy.apns.util.ApnsPayloadBuilder;
+import com.eatthepath.pushy.apns.util.InterruptionLevel;
 import com.eatthepath.pushy.apns.util.SimpleApnsPayloadBuilder;
 import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
 import org.apache.commons.logging.Log;
@@ -56,6 +57,7 @@ public class APNS implements PushNotifier {
         ApnsPayloadBuilder payloadBuilder = new SimpleApnsPayloadBuilder();
         payloadBuilder.setAlertBody("Please log in");
         payloadBuilder.setMutableContent(true);
+        payloadBuilder.setInterruptionLevel(InterruptionLevel.TIME_SENSITIVE);
         payloadBuilder.addCustomProperty("challenge", authorizationUrl);
         payloadBuilder.addCustomProperty("authenticationTimeout", 30L);
         payloadBuilder.addCustomProperty("serviceName", serviceName);
