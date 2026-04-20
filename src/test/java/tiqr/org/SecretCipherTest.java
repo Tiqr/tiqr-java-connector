@@ -1,9 +1,16 @@
 package tiqr.org;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.GCMParameterSpec;
+import java.security.Key;
+import java.util.Base64;
 import java.util.UUID;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SecretCipherTest {
@@ -30,4 +37,26 @@ class SecretCipherTest {
         assertEquals(sharedSecret, decrypted);
     }
 
+    @Test
+    void migration() {
+        String secret = UUID.randomUUID().toString();
+        SecretCipher secretCipher = new SecretCipher(secret);
+
+        String encryptedLegacy = encryptLegacy(secretCipher, secret);
+        String decryptedLegacy = secretCipher.decryptLegacy(encryptedLegacy);
+        assertEquals(secret, decryptedLegacy);
+
+        String encrypted = secretCipher.encrypt(decryptedLegacy);
+        String decrypted = secretCipher.decrypt(encrypted);
+        assertEquals(secret, decrypted);
+    }
+
+    @SneakyThrows
+    public static String encryptLegacy(SecretCipher secretCipher, String sharedSecret) {
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        Key secretKey = (Key) ReflectionTestUtils.getField(secretCipher, "secretKey");
+        GCMParameterSpec parameterSpec = (GCMParameterSpec) ReflectionTestUtils.getField(secretCipher, "parameterSpec");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, parameterSpec);
+        return Base64.getEncoder().encodeToString(cipher.doFinal(sharedSecret.getBytes(UTF_8)));
+    }
 }

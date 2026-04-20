@@ -1,8 +1,17 @@
 package tiqr.org;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.util.UriComponentsBuilder;
-import tiqr.org.model.*;
+import tiqr.org.model.Authentication;
+import tiqr.org.model.AuthenticationData;
+import tiqr.org.model.AuthenticationStatus;
+import tiqr.org.model.Enrollment;
+import tiqr.org.model.EnrollmentStatus;
+import tiqr.org.model.MetaData;
+import tiqr.org.model.Registration;
+import tiqr.org.model.RegistrationStatus;
+import tiqr.org.model.Service;
 import tiqr.org.push.APNSConfiguration;
 import tiqr.org.push.GCMConfiguration;
 import tiqr.org.repo.AuthenticationRepository;
@@ -83,9 +92,6 @@ class TiqrServiceTest {
         Registration result = tiqrService.enrollData(registration);
         assertEquals(metaData.getIdentity().getIdentifier(), registration.getId());
 
-        SecretCipher cipher = new SecretCipher("secret");
-        assertEquals(result.getSecret(), cipher.encrypt(sharedSecret));
-
         when(registrationRepository.findRegistrationByUserId(userId))
                 .thenReturn(Optional.of(registration));
         assertThrows(TiqrException.class, () ->
@@ -115,12 +121,24 @@ class TiqrServiceTest {
         tiqrService.postAuthentication(authenticationData);
         assertEquals(AuthenticationStatus.SUCCESS, tiqrService.authenticationStatus(authentication.getSessionKey()).getStatus());
 
+        SecretCipher secretCipher = (SecretCipher) ReflectionTestUtils.getField(tiqrService, "secretCipher");
+        String decrypted = secretCipher.decrypt(result.getEncryptedSecret());
+        assertEquals(sharedSecret, decrypted);
+
         //Mimic the scenario where the user manually enters the TOTP code
         authentication.setStatus(AuthenticationStatus.PENDING);
         when(authenticationRepository.findAuthenticationBySessionKey(authentication.getSessionKey()))
                 .thenReturn(Optional.of(authentication));
+
+        result.setEncryptedSecret(null);
+        result.setSecret(SecretCipherTest.encryptLegacy(secretCipher, sharedSecret));
+        when(registrationRepository.findRegistrationByUserId(anyString())).thenReturn(Optional.of(result));
+
         tiqrService.postAuthentication(new AuthenticationData(authenticationData.getSessionKey(), authenticationData.getResponse()));
         assertEquals(AuthenticationStatus.SUCCESS, tiqrService.authenticationStatus(authentication.getSessionKey()).getStatus());
+        assertNotNull(result.getSecret());
+        assertEquals(sharedSecret, secretCipher.decrypt(result.getEncryptedSecret()));
+
     }
 
     @Test

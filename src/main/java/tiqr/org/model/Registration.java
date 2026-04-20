@@ -20,6 +20,7 @@ public class Registration implements Serializable {
     private String userId;
     private String userDisplayName;
     private String secret;
+    private String encryptedSecret;
     private String enrollmentSecret;
     private String language;
     private String notificationType;
