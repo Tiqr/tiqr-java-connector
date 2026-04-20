@@ -52,7 +52,7 @@ public class SecretCipher {
     public String decryptLegacy(String encodedEncryptedSecret) {
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec);
-        return new String(cipher.doFinal(Base64.getDecoder().decode(encodedEncryptedSecret)));
+        return new String(cipher.doFinal(Base64.getDecoder().decode(encodedEncryptedSecret)), UTF_8);
     }
 
     @SneakyThrows

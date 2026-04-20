@@ -195,17 +195,16 @@ public class DefaultTiqrService implements TiqrService {
         }
 
         Registration registration = registrationRepository.findRegistrationByUserId(authentication.getUserID())
-                .orElseThrow(() -> new TiqrException("No authentication found user: " + authentication.getUserID()));
+                .orElseThrow(() -> new TiqrException("No registration found user: " + authentication.getUserID()));
         String decryptedSecret;
         if (StringUtils.hasText(registration.getEncryptedSecret())) {
             decryptedSecret = secretCipher.decrypt(registration.getEncryptedSecret());
         } else {
             decryptedSecret = secretCipher.decryptLegacy(registration.getSecret());
             String newEncryptedSecret = secretCipher.encrypt(decryptedSecret);
-            //Save and nullify the old encrypted secret
+            // Save the migrated encrypted secret and nullify the old legacy secret
             registration.setEncryptedSecret(newEncryptedSecret);
             registration.setSecret(null);
-            registrationRepository.save(registration);
         }
         Challenge.verifyOcra(decryptedSecret, authentication.getChallenge(), authentication.getSessionKey(), authenticationData.getResponse());
 

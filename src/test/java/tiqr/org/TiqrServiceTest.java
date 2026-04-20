@@ -123,7 +123,7 @@ class TiqrServiceTest {
 
         SecretCipher secretCipher = (SecretCipher) ReflectionTestUtils.getField(tiqrService, "secretCipher");
         String decrypted = secretCipher.decrypt(result.getEncryptedSecret());
-        assertEquals(decrypted, sharedSecret);
+        assertEquals(sharedSecret, decrypted);
 
         //Mimic the scenario where the user manually enters the TOTP code
         authentication.setStatus(AuthenticationStatus.PENDING);
