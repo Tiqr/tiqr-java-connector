@@ -102,7 +102,9 @@ public class DefaultTiqrService implements TiqrService {
 
         registration.validateForInitialEnrollment();
 
-        registration.setSecret(secretCipher.encrypt(registration.getSecret()));
+        registration.setEncryptedSecret(secretCipher.encrypt(registration.getSecret()));
+        registration.setSecret(null);
+
         Instant now = Instant.now();
         registration.setCreated(now);
         registration.setUpdated(now);
@@ -194,8 +196,17 @@ public class DefaultTiqrService implements TiqrService {
 
         Registration registration = registrationRepository.findRegistrationByUserId(authentication.getUserID())
                 .orElseThrow(() -> new TiqrException("No authentication found user: " + authentication.getUserID()));
-
-        String decryptedSecret = secretCipher.decrypt(registration.getSecret());
+        String decryptedSecret;
+        if (StringUtils.hasText(registration.getEncryptedSecret())) {
+            decryptedSecret = secretCipher.decrypt(registration.getEncryptedSecret());
+        } else {
+            decryptedSecret = secretCipher.decryptLegacy(registration.getSecret());
+            String newEncryptedSecret = secretCipher.encrypt(decryptedSecret);
+            //Save and nullify the old encrypted secret
+            registration.setEncryptedSecret(newEncryptedSecret);
+            registration.setSecret(null);
+            registrationRepository.save(registration);
+        }
         Challenge.verifyOcra(decryptedSecret, authentication.getChallenge(), authentication.getSessionKey(), authenticationData.getResponse());
 
         String notificationAddress = authenticationData.getNotificationAddress();
