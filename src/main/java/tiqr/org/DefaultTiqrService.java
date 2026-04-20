@@ -202,9 +202,8 @@ public class DefaultTiqrService implements TiqrService {
         } else {
             decryptedSecret = secretCipher.decryptLegacy(registration.getSecret());
             String newEncryptedSecret = secretCipher.encrypt(decryptedSecret);
-            // Save the migrated encrypted secret and nullify the old legacy secret
+            // Save the migrated encrypted secret and not nullify the old legacy secret for possible rollback
             registration.setEncryptedSecret(newEncryptedSecret);
-            registration.setSecret(null);
         }
         Challenge.verifyOcra(decryptedSecret, authentication.getChallenge(), authentication.getSessionKey(), authenticationData.getResponse());
 

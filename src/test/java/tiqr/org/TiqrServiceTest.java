@@ -136,7 +136,7 @@ class TiqrServiceTest {
 
         tiqrService.postAuthentication(new AuthenticationData(authenticationData.getSessionKey(), authenticationData.getResponse()));
         assertEquals(AuthenticationStatus.SUCCESS, tiqrService.authenticationStatus(authentication.getSessionKey()).getStatus());
-        assertNull(result.getSecret());
+        assertNotNull(result.getSecret());
         assertEquals(sharedSecret, secretCipher.decrypt(result.getEncryptedSecret()));
 
     }
