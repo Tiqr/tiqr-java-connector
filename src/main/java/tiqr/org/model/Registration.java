@@ -2,6 +2,7 @@ package tiqr.org.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.Assert;
@@ -13,6 +14,7 @@ import java.time.Instant;
 @Getter
 @Document(collection = "registrations")
 @Setter
+@ToString(exclude = {"id", "secret", "created", "updated", "enrollmentSecret"})
 public class Registration implements Serializable {
 
     @Id
