@@ -134,7 +134,6 @@ class TiqrServiceTest {
     @Test
     void ensureRegistrationIsValid() {
         Registration registration = new Registration();
-        registration.setEnrollmentSecret("secret");
         Enrollment enrollment = new Enrollment("key", "user-id", "display-name", EnrollmentStatus.RETRIEVED);
         when(enrollmentRepository.findEnrollmentByEnrollmentSecret(registration.getEnrollmentSecret())).thenReturn(Optional.of(enrollment));
 
