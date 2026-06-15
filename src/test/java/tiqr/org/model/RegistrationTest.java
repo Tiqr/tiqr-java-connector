@@ -12,7 +12,6 @@ class RegistrationTest {
         registration.setEnrollmentSecret("secret");
         registration.setStatus(RegistrationStatus.INITIALIZED);
         registration.setUserId("userId");
-        registration.setNotificationAddress("address");
         registration.validateForInitialEnrollment();
     }
 }

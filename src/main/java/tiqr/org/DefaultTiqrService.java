@@ -163,11 +163,13 @@ public class DefaultTiqrService implements TiqrService {
                 authenticationUrl,
                 AuthenticationStatus.PENDING);
 
-        if (sendPushNotification && StringUtils.hasText(registration.getNotificationType())) {
+        if (sendPushNotification && StringUtils.hasText(registration.getNotificationType()) &&
+                StringUtils.hasText(registration.getNotificationAddress())) {
             try {
                 LOG.info(String.format(
-                        "Sending push notification (%s) to %s for user %s",
+                        "Sending push notification (%s) to %s %s for user %s",
                         serviceName,
+                        registration.getNotificationType(),
                         registration.getNotificationAddress(),
                         userDisplayName
                 ));

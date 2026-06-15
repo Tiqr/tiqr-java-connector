@@ -41,7 +41,6 @@ public class Registration implements Serializable {
 
     public void validateForPushNotification() {
         Assert.hasLength(userId, "userId is empty");
-        Assert.hasLength(notificationAddress, "notificationAddress is empty");
         if (StringUtils.hasText(notificationType)) {
             NotificationType.valueOf(notificationType);
         }
