@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -38,8 +39,9 @@ public class Registration implements Serializable {
 
     public void validateForPushNotification() {
         Assert.hasLength(userId, "userId is empty");
-        Assert.hasLength(notificationType, "notificationType is empty");
         Assert.hasLength(notificationAddress, "notificationAddress is empty");
-        NotificationType.valueOf(notificationType);
+        if (StringUtils.hasText(notificationType)) {
+            NotificationType.valueOf(notificationType);
+        }
     }
 }
