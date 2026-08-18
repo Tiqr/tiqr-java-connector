@@ -33,7 +33,7 @@ public class Service {
                 baseService.getAuthenticationUrl(),
                 baseService.isPushNotificationsEnabled(),
                 UriComponentsBuilder
-                        .fromHttpUrl(baseService.enrollmentUrl)
+                        .fromUriString(baseService.enrollmentUrl)
                         .queryParam("enrollment_secret", enrollmentSecret)
                         .toUriString()
         );
